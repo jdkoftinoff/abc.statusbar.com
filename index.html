@@ -1,46 +1,47 @@
 <!DOCTYPE html>
-<!--HTML5 doctype-->
 <html>
+ 
     <head>
+        <title>UI Starter</title>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-        <script src="js/appframework.min.js"></script>
-        <script src="js/appframework.ui.min.js"></script>
-
-        <script type="text/javascript" language="javascript">
-            // This event handler is fired once the AppMobi libraries are ready
-            function onDeviceReady() {
-                //use AppMobi viewport to handle device resolution differences if you want
-               
-                //hide splash screen now that our app is ready to run
-                AppMobi.device.hideSplashScreen();
-                setTimeout(function(){
+        <link rel="stylesheet" type="text/css" href="css/icons.css" />
+        <link rel="stylesheet" type="text/css" href="css/af.ui.css"  />
+        <!-- uncomment for  apps
+        <script type="text/javascript" charset="utf-8" src="indelxdk.js"></script>        
+        -->
+        <script type="text/javascript" charset="utf-8" src="ui/appframework.ui.min.js"></script>
+   <!-- emulate touch events on desktop browsers only -->
+    <script>
+        if (!((window.DocumentTouch && document instanceof DocumentTouch) || 'ontouchstart' in window)) {
+            var script = document.createElement("script");
+            script.src = "plugins/af.desktopBrowsers.js";
+            var tag = $("head").append(script);
+        }
+    </script>
+    <script type="text/javascript">
+ 
+        $.ui.autoLaunch = false; //By default, it is set to true and you're app will run right away.  We set it to false to show a splashscreen
+        /* This function runs when the body is loaded.*/
+        var init = function () {
+                $.ui.backButtonText = "Back";// We override the back button text to always say "Back"
+                window.setTimeout(function () {
                     $.ui.launch();
-                },50);
-            }
-
-            //initial event handler to detect when appMobi is ready to roll
-            document.addEventListener("appMobi.device.ready",onDeviceReady,false);
-        </script> 
-
-        <script>
-            $.ui.autoLaunch=false;
-            $.ui.useOSThemes=false;
-            $.ui.blockPageScroll();
-            $(document).ready(function(){
-                if($.ui.useOSThemes&&!$.os.ios&&$("#afui").get(0).className!=="ios")
-                $("#afui").removeClass("ios");
-            });
-        </script>
-        <link href="css/icons.css" rel="stylesheet" type="text/css"></link>
-        <link href="css/af.ui.css" rel="stylesheet" type="text/css"></link>
-    </head>
+                }, 1500);//We wait 1.5 seconds to call $.ui.launch after DOMContentLoaded fires
+        };
+        document.addEventListener("DOMContentLoaded", init, false);
+         
+        /* This code is used for Intel native apps */
+        var onDeviceReady = function () {                    
+                intel.xdk.device.hideSplashScreen();
+ 
+        };
+        document.addEventListener("intel.xdk.device.ready", onDeviceReady, false);
+    </script>
+</head>    
     <body>
-        <div id="afui" class='ios7'>
-          
+        <div id="afui"> <!-- this is the main container div.  This way, you can have only part of your app use UI -->
 <div id="header"></div>
           
 <div id="content" style="">
@@ -156,15 +157,7 @@
           
 <div id="navbar">
 	<a href="#page_inputs" class="icon home">Inputs</a><a href="#page_answers" class="icon star">Answers</a>
-</div>
-        
-<header id="header_0" data-appbuilder-object="header">
-	     <a id="backButton" href="#" class="button back" style="visibility: visible; ">Back</a>
-	<h1 id="pageTitle" class="">
-		test
-	</h1>
-	     
-</header>
+</div>        
         </div>
     </body>
 </html>
