@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<!--HTML5 doctype-->
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+        <script type="text/javascript" charset="utf-8" src="http://localhost:58888/_appMobi/appmobi.js"></script>
+
+        <script type="text/javascript" language="javascript">
+            // This event handler is fired once the AppMobi libraries are ready
+            function onDeviceReady() {
+                //use AppMobi viewport to handle device resolution differences if you want
+               
+                //hide splash screen now that our app is ready to run
+                AppMobi.device.hideSplashScreen();
+                setTimeout(function(){
+                    $.ui.launch();
+                },50);
+            }
+
+            //initial event handler to detect when appMobi is ready to roll
+            document.addEventListener("appMobi.device.ready",onDeviceReady,false);
+        </script> 
+
+        <script src="js/appframework.ui.min.js"></script>
+        <script>
+            $.ui.autoLaunch=false;
+            $.ui.useOSThemes=false;
+            $.ui.blockPageScroll();
+            $(document).ready(function(){
+                if($.ui.useOSThemes&&!$.os.ios&&$("#afui").get(0).className!=="ios")
+                $("#afui").removeClass("ios");
+            });
+        </script>
+        <link href="css/icons.css" rel="stylesheet" type="text/css"></link>
+        <link href="css/af.ui.css" rel="stylesheet" type="text/css"></link>
+    </head>
+    <body>
+        <div id="afui" class='ios7'>
+          
+<div id="header"></div>
+          
+<div id="content" style="">
+	          
+	<div class="panel" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
+		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
+			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
+				<label for="input_network_speed">Network Speed</label>
+				<select id="input_network_speed">
+					<option value="100e6">
+						100baseT
+					</option>
+					<option value="1e9" selected="">
+						1 GigE
+					</option>
+					<option value="10e9">
+						10 GigE
+					</option>
+					<option value="40e9">
+						40 GigE
+					</option>
+				</select>
+			</div>
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="input_avb_bw">AVB BW Allocation</label>
+				<input type="text" style="float:left;" id="input_avb_bw" placeholder="75%">
+			</div>
+			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
+				<label for="input_stream_format">Stream Format</label>
+				<select id="input_stream_format">
+					<option value="AM824nb" selected="">
+						AM824 (non blocking)
+					</option>
+					<option value="AM824b">
+						AM824 (blocking)
+					</option>
+					<option value="AAF">
+						AAF
+					</option>
+				</select>
+			</div>
+			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
+				<label for="input_sample_rate">Sample Rate</label>
+				<select id="input_sample_rate">
+					<option value="32000">
+						32.0 kHz
+					</option>
+					<option value="44100">
+						44.1 kHz
+					</option>
+					<option value="48000" selected="">
+						48 kHz
+					</option>
+					<option value="96000">
+						96 kHz
+					</option>
+				</select>
+			</div>
+			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
+				<label for="inut_bits_per_sample">Bits/Sample</label>
+				<select id="inut_bits_per_sample">
+					<option value="16">
+						16
+					</option>
+					<option value="24" selected="">
+						24
+					</option>
+					<option value="32">
+						32
+					</option>
+				</select>
+			</div>
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="input_channel_count">Channel Count</label>
+				<input type="text" style="float:left;" id="input_channel_count" placeholder="">
+			</div>
+			<div class="checkbox_element form_element" style="width:100%;overflow:hidden;padding-bottom:10px" data-appbuilder-object="checkbox">
+				<label></label>
+				<input type="checkbox" name="input_async_checkbox" value="on" id="057cf2f1-26f7-340e-7aee-f4912051e1c3" checked="">
+				<label for="057cf2f1-26f7-340e-7aee-f4912051e1c3">Async Packetization</label>
+			</div>
+		</form>
+	</div>
+	<div class="panel" title="Answers" id="page_answers" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
+		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="answer_status">Status</label>
+				<input type="text" style="float:left;" id="answer_status" placeholder="">
+			</div>
+			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
+				<label for="answer_octets_per_packet">Octets per packet</label>
+				<input type="text" style="float:left;" id="answer_octets_per_packet" placeholder="">
+			</div>
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="answer_micros_per_packet">µs per packet</label>
+				<input type="text" style="float:left;" id="answer_micros_per_packet" placeholder="">
+			</div>
+			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
+				<label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
+				<input type="text" style="float:left;" id="output_max_stream_count_per_net_link" placeholder="">
+			</div>
+			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
+				<label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
+				<input type="text" style="float:left;" id="output_leftover_bw_in_bps" placeholder="">
+			</div>
+			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
+				<label for="output_total_channels_per_net_link">Total channels per network link</label>
+				<input type="text" style="float:left;" id="output_total_channels_per_net_link" placeholder="">
+			</div>
+		</div>
+	</div>
+</div>
+          
+<div id="navbar">
+	<a href="#page_inputs" class="icon home">Inputs</a><a href="#page_answers" class="icon star">Answers</a>
+</div>
+        
+<header id="header_0" data-appbuilder-object="header">
+	     <a id="backButton" href="#" class="button back" style="visibility: visible; ">Back</a>
+	<h1 id="pageTitle" class="">
+		test
+	</h1>
+	     
+</header>
+        </div>
+    </body>
+</html>
