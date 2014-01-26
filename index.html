@@ -10,6 +10,7 @@
         <link rel="stylesheet" type="text/css" href="css/icons.css" />
         <link rel="stylesheet" type="text/css" href="css/af.ui.css"  />
         <script type="text/javascript" charset="utf-8" src="ui/appframework.ui.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="avbcalc.js"></script>
         <script type="text/javascript">
 
 if(navigator.userAgent.match(/Android/i)){
@@ -22,21 +23,11 @@ if (!((window.DocumentTouch && document instanceof DocumentTouch) || 'ontouchsta
     var tag = $("head").append(script);
 }
 
-// AVB Bandwidth Calculator, By J. D. Koftinoff Software, Ltd.  jeffk@jdkoftinoff.com
-// 2014-01-25
-
-function calculate_avb( inputs ) {
-    r={};
-    r.status = " " + inputs.network_speed + " " + inputs.avb_bw;
-    r.octets_per_packet=1500;
-    return r;
-}
-
 
 var init = function () {
         window.setTimeout(function () {
             $.ui.launch();
-        }, 1500);//We wait 1.5 seconds to call $.ui.launch after DOMContentLoaded fires
+        }, 1500);
 
 
         var calculate = $("#calculate").get();
