@@ -199,13 +199,13 @@ function calculate_avb( inputs ) {
     r.micros_per_frame=r.octets_per_frame * r.micros_per_octet;
 
     // microseconds taken by the frames for this stream per observation interval
-    r.micros_per_observation_interval = r.micros_per_frame * r.frames_per_observation_interval;
+    r.micros_spent_per_observation_interval = r.micros_per_frame * r.frames_per_observation_interval;
 
     // available time per observation interval
-    r.available_time_per_observation_interval_in_micros = 1000 * (inputs.avb_bw*0.01) / r.observation_intervals_per_second;
+    r.available_time_per_observation_interval_in_micros = 1000000 * (inputs.avb_bw*0.01) / r.observation_intervals_per_second;
 
     // if the payload time of the packets is too large for the available time then this is an error
-    if( r.micros_per_observation_interval_in_micros > r.available_time_per_observation_interval ) {
+    if( r.micros_spent_per_observation_interval > r.available_time_per_observation_interval_in_micros ) {
         r.status = "Err: Time > " + inputs.avb_bw + "%";
     }
 
@@ -225,8 +225,6 @@ function calculate_avb( inputs ) {
 
     // How many channels in total?
     r.total_channels_per_net_link = r.max_stream_count_per_net_link * inputs.channel_count;
-    var detail = JSON.stringify(r,undefined,2);
-    alert(detail);
     return r;
 }
 

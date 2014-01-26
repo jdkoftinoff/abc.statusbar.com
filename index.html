@@ -64,15 +64,12 @@ var init = function () {
                 if( key ) {
                     var item = $("#output_" + key );
                     if( item && outputs[key] ) {
-                        item.value( outputs[key] );
-//                        alert( "" + key + ":" + outputs[key] );
+                        item.val( outputs[key] );
                     }
                 }
             }
 
-            $("#output_detail").val(JSON.stringify(outputs,undefined,2));
-//            $("#answers_button").click();
-            alert(JSON.stringify(outputs));
+            $("#output_detail").text(JSON.stringify(outputs,undefined,2));
         }
 };
 
@@ -83,7 +80,7 @@ document.addEventListener("DOMContentLoaded", init, false);
     </head>
     <body><div id="afui"><div id="header"></div><div id="content" style="">
 	<div class="panel" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
-        <div><a href="http://avb.statusbar.com/">By Jeff Koftinoff</a></div>
+        <div>By Jeff Koftinoff - avb.statusbar.com</div>
 		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_network_speed_in_bps">Network Speed</label>
@@ -130,8 +127,8 @@ document.addEventListener("DOMContentLoaded", init, false);
 				<label for="input_channel_count">Channel Count</label>
 				<input type="text" style="float:left;" id="input_channel_count" value="1">
 			</div>
-            <center><button id="calculate" style="width:50%; height:3em;">Calculate</button></center>
 		</form>
+        <center><button id="calculate" style="width:50%; height:3em;">Calculate</button></center>
 	</div>
 	<div class="panel" title="Answers" id="page_answers" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
 		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
@@ -172,7 +169,7 @@ document.addEventListener("DOMContentLoaded", init, false);
 	</div>
     <div class="panel" title="Details" id="page_details" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
 		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
-            <textarea id="output_detail" rows="50" style="width:100%;height:100%;"></textarea>
+            <pre id="output_detail" style="width:100%;height:100%;"></pre>
         </div>
     </div>
 
