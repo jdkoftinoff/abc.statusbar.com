@@ -9,6 +9,17 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <link rel="stylesheet" type="text/css" href="css/icons.css" />
         <link rel="stylesheet" type="text/css" href="css/af.ui.css"  />
+        <style type="text/css">
+.scrollable {
+position: absolute;
+top: 50px;
+left: 0;
+right: 0;
+bottom: 0;
+overflow: scroll;
+-webkit-overflow-scrolling: touch;
+}
+        </style>
         <script type="text/javascript" charset="utf-8" src="ui/appframework.ui.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="avbcalc.js"></script>
         <script type="text/javascript">
@@ -81,8 +92,8 @@ document.addEventListener("DOMContentLoaded", init, false);
         </script>
     </head>
     <body><div id="afui"><div id="header"></div><div id="content" style="">
-	<div class="panel" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
-        <div>By Jeff Koftinoff - avb.statusbar.com</div>
+	<div class="panel scrollable" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
+        <div style="text-align:right;">By Jeff Koftinoff - avb.statusbar.com - 2014-01-26</div>
 		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_network_speed_in_bps">Network Speed</label>
@@ -133,7 +144,7 @@ document.addEventListener("DOMContentLoaded", init, false);
         <center><button id="calculate" style="width:50%; height:3em;">Calculate</button></center>
 	</div>
 	<div class="panel" title="Answers" id="page_answers" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
-		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
+		<div class="container scrollable" style="width:100%" data-appbuilder-object="container" data-position="static">
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
 				<label for="output_status">Status</label>
 				<input type="text" style="float:left;" id="output_status" readonly >
@@ -170,7 +181,7 @@ document.addEventListener("DOMContentLoaded", init, false);
 		</div>
 	</div>
     <div class="panel" title="Details" id="page_details" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
-		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
+		<div class="container scrollable" style="width:100%" data-appbuilder-object="container" data-position="static">
             <pre id="output_detail" style="width:100%;height:100%;"></pre>
         </div>
     </div>
