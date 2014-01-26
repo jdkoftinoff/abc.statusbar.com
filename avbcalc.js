@@ -94,7 +94,7 @@ function calculate_avb( inputs ) {
     r.ethernet_frame = {};
 
     // Default to good status
-    r.status = "success";
+    r.status = "Bad Format";
 
     // all components of the frame
     r.ethernet_frame.interframe_gap = 12;
@@ -110,13 +110,13 @@ function calculate_avb( inputs ) {
     // Determine samples_per_frame, syt_interval, octets_per_sample, frames_per_observation_interval,
     // and observation_intervals_per_second values based on stream format and other options
     if( inputs.stream_format == "AM824nb" ) {
-
+        r.status = "success";
         // AM824 non blocking mode may be asynchronous or synchronous
-//        if( inputs.async ) {
-//           r.samples_per_frame = am824nb_async_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
-//        } else {
-            r.samples_per_frame = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
-//        }
+        if( inputs.async==1 ) {
+           r.samples_per_frame = am824nb_async_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
+        } else {
+           r.samples_per_frame = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
+        }
 
         // AM824 always has a cip_header of 8 octets
         r.ethernet_frame.cip_header = 8;
@@ -134,6 +134,7 @@ function calculate_avb( inputs ) {
         r.observation_intervals_per_second = 8000;
 
     } else if ( inputs.stream_format == "AM824b" ) {
+        r.status = "success";
 
         // AM824 always has a cip_header of 8 octets
         r.ethernet_frame.cip_header = 8;
@@ -153,24 +154,45 @@ function calculate_avb( inputs ) {
         // Class A is 8000 observation intervals per second
         r.observation_intervals_per_second = 8000;
 
-    } else {
+    } else if ( inputs.stream_format == "AAF" ) {
+        r.status = "success";
 
-        // This format isn't handled yet
-        r.status = "ERROR: unsupported fmt";
+        // No CIP header for AAF
+        r.ethernet_frame.cip_header = 0;
+
+        // AAF header is fully contained in 1722 header
+        r.ethernet_frame.aaf_header = 0;
+
+
+        // Class A is 8000 observation intervals per second
+        r.observation_intervals_per_second = 8000;
+
+        // AAF allows 16,24, and 32 bit bits per sample
+        r.octets_per_sample = inputs.bits_per_sample / 8;
+
+        // The number of samples per observation interval for a sample rate is the same as am824nb
+        r.samples_per_observation_interval = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
+
+        // samples per frame can be parameterized
+        if( inputs.samples_per_frame > 0 ) {
+            r.samples_per_frame = inputs.samples_per_frame;
+        } else {
+            r.samples_per_frame = r.samples_per_observation_interval;
+        }
+
+        // From the samples per frame, calculate how many frames per observation interval are needed to be sent
+        r.frames_per_observation_interval = Math.ceil( r.samples_per_observation_interval / r.samples_per_frame );
     }
-
-//    if( inputs.aes_gcm ) {
-// This format isn't handled yet
-//        r.status = "ERROR: AES-GCM not supported";
-//    }
 
     // Calculate the audio payload octets
     r.ethernet_frame.audio_payload = r.octets_per_sample * r.samples_per_frame * inputs.channel_count;
 
-    // Calculate the total octets for the frame for SRP BW usage
-    r.octets_per_frame=1; // SRP adds 1 octet per frame
+    // Calculate the total octets for the frame
+    r.octets_per_frame = 0;
     for( var i in r.ethernet_frame ) {
-        r.octets_per_frame += r.ethernet_frame[i];
+        if( r.ethernet_frame[i] ) {
+            r.octets_per_frame += r.ethernet_frame[i];
+        }
     }
 
     // Calculate the total payload length
@@ -180,9 +202,40 @@ function calculate_avb( inputs ) {
         +r.ethernet_frame.aaf_header
         +r.ethernet_frame.audio_payload;
 
-    // if it is smaller than 42 then we need to pad it to 42 for minimum ethernet frame size
-    if( r.ethernet_payload_length<42 ) {
-        r.ethernet_frame.padding = 42 - ethernet_payload_length;
+    // Is the stream encrypted?
+    if( inputs.aes_gcm==1 ) {
+        // If the stream is encrypted with AES_GCM then the payload needs to be
+        // a multiple of 16 bytes and then the AES_GCM header/footer overhead added
+        r.ethernet_frame.aes_gcm_padding = 0;
+        var aes_gcm_block_size=16;
+        var remainder = r.ethernet_payload_length % aes_gcm_block_size;
+        if( remainder>0 ) {
+            r.ethernet_frame.aes_gcm_padding = aes_gcm_block_size-remainder;
+        }
+        // Add the additional headers/footers for AESGCM
+        r.ethernet_frame.aes_gcm_subtype_data = 4;
+        r.ethernet_frame.aes_gcm_key_id = 8
+        r.ethernet_frame.aes_gcm_aes_seed = 4;
+        r.ethernet_frame.aes_gcm_auth = 8;
+
+        r.aes_gcm_overhead = r.ethernet_frame.aes_gcm_subtype_data
+            + r.ethernet_frame.aes_gcm_key_id
+            + r.ethernet_frame.aes_gcm_aes_seed
+            + r.ethernet_frame.aes_gcm_auth
+            + r.ethernet_frame.aes_gcm_padding;
+
+        r.ethernet_payload_length += r.aes_gcm_overhead;
+        r.octets_per_frame += r.aes_gcm_overhead;
+    }
+
+    r.octets_per_frame=r.octets_per_frame+1; // SRP adds 1 octet per frame
+
+    // if it is smaller than 46 then we need to pad it to 46 for minimum
+    // ethernet frame size of 68 bytes for bandwidth reservation requirements
+    // as while the smallest frame can be 64, it must also be able to have
+    // an additional tag
+    if( r.ethernet_payload_length<46 ) {
+        r.ethernet_frame.padding = 46 - r.ethernet_payload_length;
         r.octets_per_frame += r.ethernet_frame.padding;
         r.ethernet_payload_length += r.ethernet_frame.padding;
     }
@@ -209,9 +262,10 @@ function calculate_avb( inputs ) {
         r.status = "Err: Time > " + inputs.avb_bw + "%";
     }
 
+    // Add up all the octet times for all bandwidth reserved for a second to calc the bandwidth per stream
     r.bw_per_stream_in_bps = (8*r.octets_per_frame*r.frames_per_observation_interval*r.observation_intervals_per_second);
 
-    // How many can we fit?
+    // How many streams can we fit on this link?
     r.max_stream_count_per_net_link = Math.floor( inputs.network_speed_in_bps * inputs.avb_bw*0.01 / r.bw_per_stream_in_bps);
 
     // And how much BW in bps do those streams use?
