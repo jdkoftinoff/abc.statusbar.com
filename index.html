@@ -35,13 +35,15 @@ var init = function () {
         calculate.onclick = function() {
             // The list of input parameters
             var input_items = [
-                "network_speed", "avb_bw", "stream_format", "sample_rate",
-                "bits_per_sample", "channel_count", "async", "aes_gcm" ];
+                "network_speed_in_bps", "avb_bw", "stream_format", "sample_rate",
+                "bits_per_sample", "channel_count" ];
 
             // The list of output parameters
             var output_items = [
-                "status", "octets_per_packet", "micros_per_packet",
-                "max_stream_count_per_net_link", "leftover_bw_in_bps",
+                "status", "octets_per_frame", "micros_per_frame",
+                "bw_per_stream_in_bps",
+                "max_stream_count_per_net_link", "total_bw_used_in_bps",
+                "leftover_bw_in_bps",
                 "total_channels_per_net_link"
             ];
 
@@ -59,13 +61,18 @@ var init = function () {
             // Store the outputs of the calculation into the form
             for( var i in output_items ) {
                 var key=output_items[i];
-                var item = $("#output_" + key );
-                if( item && outputs[key] ) {
-                    item.val( outputs[key] );
+                if( key ) {
+                    var item = $("#output_" + key );
+                    if( item && outputs[key] ) {
+                        item.value( outputs[key] );
+//                        alert( "" + key + ":" + outputs[key] );
+                    }
                 }
             }
 
-            $("#answers_button").click();
+            $("#output_detail").val(JSON.stringify(outputs,undefined,2));
+//            $("#answers_button").click();
+            alert(JSON.stringify(outputs));
         }
 };
 
@@ -76,10 +83,11 @@ document.addEventListener("DOMContentLoaded", init, false);
     </head>
     <body><div id="afui"><div id="header"></div><div id="content" style="">
 	<div class="panel" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
+        <div><a href="http://avb.statusbar.com/">By Jeff Koftinoff</a></div>
 		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
-				<label for="input_network_speed">Network Speed</label>
-				<select id="input_network_speed">
+				<label for="input_network_speed_in_bps">Network Speed</label>
+				<select id="input_network_speed_in_bps">
 					<option value="100e6">100baseT</option>
 					<option value="1e9" selected="">1 GigE</option>
 					<option value="10e9">10 GigE</option>
@@ -87,8 +95,8 @@ document.addEventListener("DOMContentLoaded", init, false);
 				</select>
 			</div>
 			<div class="input_element form_element" hidden style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
-				<label for="input_avb_bw">AVB BW Allocation</label>
-				<input type="text" style="float:left;" id="input_avb_bw" value="75%">
+				<label for="input_avb_bw">AVB BW Allocation (%)</label>
+				<input type="text" style="float:left;" id="input_avb_bw" value="75">
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_stream_format">Stream Format</label>
@@ -104,7 +112,10 @@ document.addEventListener("DOMContentLoaded", init, false);
 					<option value="32000">32.0 kHz</option>
 					<option value="44100">44.1 kHz</option>
 					<option value="48000" selected="">48 kHz</option>
+					<option value="88200">88.2 kHz</option>
 					<option value="96000">96 kHz</option>
+					<option value="176400">176.4 kHz</option>
+					<option value="192000">192 kHz</option>
 				</select>
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
@@ -119,51 +130,58 @@ document.addEventListener("DOMContentLoaded", init, false);
 				<label for="input_channel_count">Channel Count</label>
 				<input type="text" style="float:left;" id="input_channel_count" value="1">
 			</div>
-			<div class="checkbox_element form_element" style="width:100%;overflow:hidden;padding-bottom:10px" data-appbuilder-object="checkbox">
-				<label></label>
-				<input type="checkbox" name="input_async_checkbox" value="on" id="input_async" checked="">
-				<label for="input_async">Async Packetization</label>
-			</div>
-			<div class="checkbox_element form_element" style="width:100%;overflow:hidden;padding-bottom:10px" data-appbuilder-object="checkbox">
-				<label></label>
-				<input type="checkbox" name="input_aes_gcm" value="off" id="input_aes_gcm" checked="">
-				<label for="input_aes_gcm">AES-GCM Encryption</label>
-			</div>
-            <center><button id="calculate" style="width:50%; height:3em;   ">Calculate</button></center>
+            <center><button id="calculate" style="width:50%; height:3em;">Calculate</button></center>
 		</form>
 	</div>
 	<div class="panel" title="Answers" id="page_answers" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
 		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
 				<label for="output_status">Status</label>
-				<input type="text" style="float:left;" id="output_status" readonly placeholder="">
+				<input type="text" style="float:left;" id="output_status" readonly >
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
-				<label for="output_octets_per_packet">Octets per packet</label>
-				<input type="text" style="float:left;" id="output_octets_per_packet" readonly placeholder="">
+				<label for="output_octets_per_frame">Octets per frame</label>
+				<input type="text" style="float:left;" id="output_octets_per_frame" readonly >
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
-				<label for="output_micros_per_packet">µs per packet</label>
-				<input type="text" style="float:left;" id="output_micros_per_packet" readonly placeholder="">
+				<label for="output_micros_per_frame">µs per frame</label>
+				<input type="text" style="float:left;" id="output_micros_per_frame" readonly >
+			</div>
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="output_bw_per_stream_in_bps">bps used per stream</label>
+				<input type="text" style="float:left;" id="output_bw_per_stream_in_bps" readonly >
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-				<input type="text" style="float:left;" id="output_max_stream_count_per_net_link" readonly placeholder="">
+				<input type="text" style="float:left;" id="output_max_stream_count_per_net_link" readonly >
 			</div>
+			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<label for="output_total_bw_used_in_bps">bps used for max stream count</label>
+				<input type="text" style="float:left;" id="output_total_bw_used_in_bps" readonly >
+			</div>
+
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
-				<input type="text" style="float:left;" id="output_leftover_bw_in_bps" readonly placeholder="">
+				<input type="text" style="float:left;" id="output_leftover_bw_in_bps" readonly >
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_total_channels_per_net_link">Total channels per network link</label>
-				<input type="text" style="float:left;" id="output_total_channels_per_net_link" readonly placeholder="">
+				<input type="text" style="float:left;" id="output_total_channels_per_net_link" readonly >
 			</div>
 		</div>
 	</div>
+    <div class="panel" title="Details" id="page_details" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
+		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
+            <textarea id="output_detail" rows="50" style="width:100%;height:100%;"></textarea>
+        </div>
+    </div>
+
 </div>
             <div id="navbar">
-                <a href="#page_inputs" class="icon home" id="inputs_button">Inputs</a><a href="#page_answers" class="icon star" id="answers_button">Answers</a>
-            </div>        
+                <a href="#page_inputs" class="icon home" id="inputs_button">Inputs</a>
+                <a href="#page_answers" class="icon star" id="answers_button">Answers</a>
+                <a href="#page_details" class="icon star" id="details_button">Details</a>
+            </div>
         </div>
     </body>
 </html>
