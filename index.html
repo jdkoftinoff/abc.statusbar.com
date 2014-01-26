@@ -62,7 +62,18 @@ var init = function () {
             var inputs = {};
             for( var i in input_items ) {
                 var key=input_items[i];
-                var val = $("#input_" + key ).val();
+                var widget = $("#input_"+key);
+                var val;
+                if( widget.attr("type") == "checkbox" ) {
+                    if( widget.is(":checked") ) {
+                        val=1;
+                    } else {
+                        val=0;
+                    }
+                } else {
+                    val=widget.val();
+                }
+
                 inputs[key] = val;
             }
 
@@ -154,13 +165,16 @@ document.addEventListener("DOMContentLoaded", init, false);
 				<input type="text" style="float:left;" id="input_channel_count" value="1">
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<input type="checkbox" name="input_aes_gcm_checkbox" style="float:left;" id="input_aes_gcm" value="0" >
 				<label for="input_aes_gcm">AES-GCM Encryption</label>
-				<input type="text" style="float:left;" id="input_aes_gcm" value="1">
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
+				<input type="checkbox" name="input_async_checkbox" style="float:left;" id="input_async" value="0">
 				<label for="input_async">Async AM824</label>
-				<input type="text" style="float:left;" id="input_async" value="0">
 			</div>
+            <div>
+            <hr>
+            </div>
 		</form>
         <center><button id="calculate" style="width:50%; height:3em;">Calculate</button></center>
 	</div>
