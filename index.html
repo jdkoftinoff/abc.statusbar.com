@@ -1,163 +1,172 @@
 <!DOCTYPE html>
 <html>
- 
     <head>
-        <title>UI Starter</title>
+        <title>ABC - AVB Bandwidth Calculator</title>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="stylesheet" type="text/css" href="css/icons.css" />
         <link rel="stylesheet" type="text/css" href="css/af.ui.css"  />
-        <!-- uncomment for  apps
-        <script type="text/javascript" charset="utf-8" src="indelxdk.js"></script>        
-        -->
         <script type="text/javascript" charset="utf-8" src="ui/appframework.ui.min.js"></script>
-   <!-- emulate touch events on desktop browsers only -->
-    <script>
-        if (!((window.DocumentTouch && document instanceof DocumentTouch) || 'ontouchstart' in window)) {
-            var script = document.createElement("script");
-            script.src = "plugins/af.desktopBrowsers.js";
-            var tag = $("head").append(script);
+        <script type="text/javascript">
+
+if (!((window.DocumentTouch && document instanceof DocumentTouch) || 'ontouchstart' in window)) {
+    var script = document.createElement("script");
+    script.src = "plugins/af.desktopBrowsers.js";
+    var tag = $("head").append(script);
+}
+
+// AVB Bandwidth Calculator, By J. D. Koftinoff Software, Ltd.  jeffk@jdkoftinoff.com
+// 2014-01-25
+
+function calculate_avb( inputs ) {
+    r={};
+    r.status = " " + inputs.network_speed + " " + inputs.avb_bw;
+    r.octets_per_packet=1500;
+    return r;
+}
+
+
+var init = function () {
+        window.setTimeout(function () {
+            $.ui.launch();
+        }, 1500);//We wait 1.5 seconds to call $.ui.launch after DOMContentLoaded fires
+
+
+        var calculate = $("#calculate").get();
+
+        calculate.onclick = function() {
+            // The list of input parameters
+            var input_items = [
+                "network_speed", "avb_bw", "stream_format", "sample_rate",
+                "bits_per_sample", "channel_count", "async", "aes_gcm" ];
+
+            // The list of output parameters
+            var output_items = [
+                "status", "octets_per_packet", "micros_per_packet",
+                "max_stream_count_per_net_link", "leftover_bw_in_bps",
+                "total_channels_per_net_link"
+            ];
+
+            // Extract the inputs from the form into one object
+            var inputs = {};
+            for( var i in input_items ) {
+                var key=input_items[i];
+                var val = $("#input_" + key ).val();
+                inputs[key] = val;
+            }
+
+            // Calculate
+            outputs = calculate_avb( inputs );
+
+            // Store the outputs of the calculation into the form
+            for( var i in output_items ) {
+                var key=output_items[i];
+                var item = $("#output_" + key );
+                if( item && outputs[key] ) {
+                    item.val( outputs[key] );
+                }
+            }
+
+            $("#answers_button").click();
         }
-    </script>
-    <script type="text/javascript">
- 
-        $.ui.autoLaunch = false; //By default, it is set to true and you're app will run right away.  We set it to false to show a splashscreen
-        /* This function runs when the body is loaded.*/
-        var init = function () {
-                $.ui.backButtonText = "Back";// We override the back button text to always say "Back"
-                window.setTimeout(function () {
-                    $.ui.launch();
-                }, 1500);//We wait 1.5 seconds to call $.ui.launch after DOMContentLoaded fires
-        };
-        document.addEventListener("DOMContentLoaded", init, false);
-         
-        /* This code is used for Intel native apps */
-        var onDeviceReady = function () {                    
-                intel.xdk.device.hideSplashScreen();
- 
-        };
-        document.addEventListener("intel.xdk.device.ready", onDeviceReady, false);
-    </script>
-</head>    
-    <body>
-        <div id="afui"> <!-- this is the main container div.  This way, you can have only part of your app use UI -->
-<div id="header"></div>
-          
-<div id="content" style="">
-	          
+};
+
+document.addEventListener("DOMContentLoaded", init, false);
+
+
+        </script>
+    </head>
+    <body><div id="afui"><div id="header"></div><div id="content" style="">
 	<div class="panel" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
 		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_network_speed">Network Speed</label>
 				<select id="input_network_speed">
-					<option value="100e6">
-						100baseT
-					</option>
-					<option value="1e9" selected="">
-						1 GigE
-					</option>
-					<option value="10e9">
-						10 GigE
-					</option>
-					<option value="40e9">
-						40 GigE
-					</option>
+					<option value="100e6">100baseT</option>
+					<option value="1e9" selected="">1 GigE</option>
+					<option value="10e9">10 GigE</option>
+					<option value="40e9">40 GigE</option>
 				</select>
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
 				<label for="input_avb_bw">AVB BW Allocation</label>
-				<input type="text" style="float:left;" id="input_avb_bw" placeholder="75%">
+				<input type="text" style="float:left;" id="input_avb_bw" value="75%">
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_stream_format">Stream Format</label>
 				<select id="input_stream_format">
-					<option value="AM824nb" selected="">
-						AM824 (non blocking)
-					</option>
-					<option value="AM824b">
-						AM824 (blocking)
-					</option>
-					<option value="AAF">
-						AAF
-					</option>
+					<option value="AM824nb" selected="">AM824 (non blocking)</option>
+					<option value="AM824b">AM824 (blocking)</option>
+					<option value="AAF">AAF</option>
 				</select>
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_sample_rate">Sample Rate</label>
 				<select id="input_sample_rate">
-					<option value="32000">
-						32.0 kHz
-					</option>
-					<option value="44100">
-						44.1 kHz
-					</option>
-					<option value="48000" selected="">
-						48 kHz
-					</option>
-					<option value="96000">
-						96 kHz
-					</option>
+					<option value="32000">32.0 kHz</option>
+					<option value="44100">44.1 kHz</option>
+					<option value="48000" selected="">48 kHz</option>
+					<option value="96000">96 kHz</option>
 				</select>
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
-				<label for="inut_bits_per_sample">Bits/Sample</label>
-				<select id="inut_bits_per_sample">
-					<option value="16">
-						16
-					</option>
-					<option value="24" selected="">
-						24
-					</option>
-					<option value="32">
-						32
-					</option>
+				<label for="input_bits_per_sample">Bits/Sample</label>
+				<select id="input_bits_per_sample">
+					<option value="16">16</option>
+					<option value="24" selected="">24</option>
+					<option value="32">32</option>
 				</select>
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
 				<label for="input_channel_count">Channel Count</label>
-				<input type="text" style="float:left;" id="input_channel_count" placeholder="">
+				<input type="text" style="float:left;" id="input_channel_count" value="1">
 			</div>
 			<div class="checkbox_element form_element" style="width:100%;overflow:hidden;padding-bottom:10px" data-appbuilder-object="checkbox">
 				<label></label>
-				<input type="checkbox" name="input_async_checkbox" value="on" id="057cf2f1-26f7-340e-7aee-f4912051e1c3" checked="">
-				<label for="057cf2f1-26f7-340e-7aee-f4912051e1c3">Async Packetization</label>
+				<input type="checkbox" name="input_async_checkbox" value="on" id="input_async" checked="">
+				<label for="input_async">Async Packetization</label>
 			</div>
+			<div class="checkbox_element form_element" style="width:100%;overflow:hidden;padding-bottom:10px" data-appbuilder-object="checkbox">
+				<label></label>
+				<input type="checkbox" name="input_aes_gcm" value="off" id="input_aes_gcm"" checked="">
+				<label for="input_aes_gcm">AES-GCM Encryption</label>
+			</div>
+            <center><button id="calculate" style="width:50%; height:3em;   ">Calculate</button></center>
 		</form>
 	</div>
 	<div class="panel" title="Answers" id="page_answers" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
 		<div class="container" style="width:100%" data-appbuilder-object="container" data-position="static">
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
-				<label for="answer_status">Status</label>
-				<input type="text" style="float:left;" id="answer_status" placeholder="">
+				<label for="output_status">Status</label>
+				<input type="text" style="float:left;" id="output_status" readonly placeholder="">
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
-				<label for="answer_octets_per_packet">Octets per packet</label>
-				<input type="text" style="float:left;" id="answer_octets_per_packet" placeholder="">
+				<label for="output_octets_per_packet">Octets per packet</label>
+				<input type="text" style="float:left;" id="output_octets_per_packet" readonly placeholder="">
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
-				<label for="answer_micros_per_packet">µs per packet</label>
-				<input type="text" style="float:left;" id="answer_micros_per_packet" placeholder="">
+				<label for="output_micros_per_packet">µs per packet</label>
+				<input type="text" style="float:left;" id="output_micros_per_packet" readonly placeholder="">
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-				<input type="text" style="float:left;" id="output_max_stream_count_per_net_link" placeholder="">
+				<input type="text" style="float:left;" id="output_max_stream_count_per_net_link" readonly placeholder="">
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
-				<input type="text" style="float:left;" id="output_leftover_bw_in_bps" placeholder="">
+				<input type="text" style="float:left;" id="output_leftover_bw_in_bps" readonly placeholder="">
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
 				<label for="output_total_channels_per_net_link">Total channels per network link</label>
-				<input type="text" style="float:left;" id="output_total_channels_per_net_link" placeholder="">
+				<input type="text" style="float:left;" id="output_total_channels_per_net_link" readonly placeholder="">
 			</div>
 		</div>
 	</div>
 </div>
-          
-<div id="navbar">
-	<a href="#page_inputs" class="icon home">Inputs</a><a href="#page_answers" class="icon star">Answers</a>
-</div>        
+            <div id="navbar">
+                <a href="#page_inputs" class="icon home" id="inputs_button">Inputs</a><a href="#page_answers" class="icon star" id="answers_button">Answers</a>
+            </div>        
         </div>
     </body>
 </html>
