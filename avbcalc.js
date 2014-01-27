@@ -109,10 +109,10 @@ function calculate_avb( inputs ) {
 
     // Determine samples_per_frame, syt_interval, octets_per_sample, frames_per_observation_interval,
     // and observation_intervals_per_second values based on stream format and other options
-    if( inputs.stream_format == "AM824nb" ) {
+    if( inputs.stream_format == "AM824nb" || inputs.stream_format == "AM824nb-async" ) {
         r.status = "success";
         // AM824 non blocking mode may be asynchronous or synchronous
-        if( inputs.async==1 ) {
+        if( inputs.stream_format=="AM824nb-async" ) {
            r.samples_per_frame = am824nb_async_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
         } else {
            r.samples_per_frame = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
