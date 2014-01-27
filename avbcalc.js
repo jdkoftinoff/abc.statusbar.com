@@ -254,7 +254,7 @@ function calculate_avb( inputs ) {
     // microseconds taken by the frames for this stream per observation interval
     r.micros_spent_per_observation_interval = r.micros_per_frame * r.frames_per_observation_interval;
 
-    if( inputs.avb_bw<10 || inputs.avb_bw>95 ) {
+    if( inputs.avb_bw<1 || inputs.avb_bw>99 ) {
         r.status = "Invalid AVB Bandwidth";
     }
 
@@ -284,7 +284,7 @@ function calculate_avb( inputs ) {
     // How many channels in total?
     if( inputs.channel_count < 1 ) {
         r.status = "Invalid channel count";
-    } else {}
+    } else {
         r.total_channels_per_net_link = r.max_stream_count_per_net_link * inputs.channel_count;
     }
     return r;
