@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", init, false);
 				</select>
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
-				<label for="input_avb_bw">AVB BW Allocation (%)</label>
+                <label for="input_avb_bw">AVB BW Allocation (%)</label>
 				<input type="text" style="float:left;" id="input_avb_bw" value="75">
 			</div>
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
@@ -220,12 +220,44 @@ document.addEventListener("DOMContentLoaded", init, false);
             <pre id="output_detail" style="width:100%;height:100%;"></pre>
         </div>
     </div>
+    <div class="panel" title="Explanations" id="page_info" data-appbuilder-object="page" style="width: 100%; overflow: hidden;">
+        <div class="container scrollable" style="width:100%" data-appbuilder-object="container" data-position="static">
+            <h1>Information</h1>
+            <p>This AVB Bandwidth Calculator is provided by Jeff Koftinoff &lt;jeff.koftinoff@gmail.com&gt;</p>
+            <p>See http://avb.statusbar.com/ for more information</p>
+            <h2 id="info_avb_bw">AVB BW Allocation</h2>
+            <p>The AVB BW Allocation defaults to 75%.  This means that the most bandwidth that AVB Time Sensitive Streams can take is 75% of the available bandwidth of each network link.</p>
+            <h2 id="info_stream_format">Stream Format</h2>
+            <p></p>
+            <h3>AM824 (non blocking)</h3>
+            <p>The typical AVB audio device transmits using “AM824 non-blocking, synchronous” mode.  Non-Blocking means it sends one frame every observation period (125µs). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).  </p>
+            <h3>AM824 (non blocking, async packetization)</h3>
+            <p>“AM824 non-blocking, asynchronous” mode means that the transmitter may send one extra or one less sample per ethernet frame due to the packetizer being asynchronous.  Devices that handle more than one clock domain but have one packetizer typically use this format. Because it can send the occasional ethernet frame with 7 samples @ 48 kHz or 13 samples @ 96 kHz, it needs to reserve enough bandwidth to allow it to do so. The Apple Mac transmits AM824 non-blocking, asynchronous mode.</p>
+            <h3>AM824 (blocking)</h3>
+            <p>“AM824 blocking mode” is an interesting mode that some firewire devices use, as it is easier to packetize and depacketize.  At 48 kHz, each ethernet frame always contains 8 samples. at 96 kHz, each ethernet frame always contains 16 samples. The avtp_timestamp is always for the first sample in the ethernet frame and there is always an avtp_timestamp. Because it is sending this frame every 125µs, there are some times when it doesn’t need to send any ethernet frame at all. But when it does, it is always the same size packet.  The drawback for this format is that you have to reserve bandwidth for the 8 sample frame @ 48 kHz or 16 sample frame at 96 kHz.</p>
+            <p>Regardless of the talker's AM824 packetization, an AVB listener would be able to receive frames using AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
+            <h3>AAF</h3>
+            <p>“AVTP Audio Format” (AAF) is a new simpler packetization format.  It has lower overhead and allows 16 bits, 24 bits at 32 bits per sample, as well as a choice on the number of samples per ethernet frame. Every ethernet frame is always the same size and format.</p>
+            <h2 id="info_sample_rate">Sample Rate</h2>
+            <p>All AVB stream formats can support 32 kHz, 44.1 kHz, 48 kHz, 88.2 kHz, 96 kHz, 176.4i kHz, and 192 kHz.  AAF can also support NTSC pulled rates (* 1.001 or * 1/1.001).</p>
+            <h2 id="info_bits_per_sample">Bits/Sample</h2>
+            <p>AM824 formats only support 24 bits per sample.  AAF formats allow packed 16 bits, 24 bits, and 32 bits per sample. For Floating point stream formats, choose 32 bits per sample.</p>
+            <h2 id="info_aaf_samples_per_frame">AAF Samples/Frame</h2>
+            <p>AM824 packetization allows one ethernet frame per stream per observation interval (125µs).  AAF format supports multiple ethernet frames per observation interval, allowing for more channels per stream.</p>
+            <h2 id="info_channel_count">Channel Count</h2>
+            <p>The channel count.</p>
+            <h2 id="info_aes_gcm_encryption">AES-GCM Encryption</h2>
+            <p>IEEE p1722a support AES-GCM encrypted AVB streams.  When the ethernet frame is encrypted this adds some overhead to the ethernet frame.</p>
+        </div>
+    </div>
+
 
 </div>
             <div id="navbar">
                 <a href="#page_inputs" class="icon home" id="inputs_button">Inputs</a>
                 <a href="#page_answers" class="icon star" id="answers_button">Answers</a>
                 <a href="#page_details" class="icon star" id="details_button">Details</a>
+                <a href="#page_info" class="icon question" id="info_button">Explanations</a>
             </div>
         </div>
     </body>
