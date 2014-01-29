@@ -77,7 +77,7 @@ var am824nb_sync_samples_per_frame_from_sample_rate = {
 };
 
 var am824b_samples_per_frame_from_sample_rate = {
-    "32000" : 4,
+    "32000" : 8,
     "44100" : 8,
     "48000" : 8,
     "88200" : 16,
