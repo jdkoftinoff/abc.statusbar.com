@@ -212,7 +212,7 @@ function calculate_avb( inputs ) {
         if( remainder>0 ) {
             r.ethernet_frame.aes_gcm_padding = aes_gcm_block_size-remainder;
         }
-        // Add the additional headers/footers for AESGCM
+        // Add the additional headers/footers for AESGCM. See IEEE p1722a Draft 7
         r.ethernet_frame.aes_gcm_subtype_data = 4;
         r.ethernet_frame.aes_gcm_sender_id = 8;
         r.ethernet_frame.aes_gcm_aes_seed = 8;
@@ -230,7 +230,7 @@ function calculate_avb( inputs ) {
         r.octets_per_frame += r.aes_gcm_overhead;
     }
 
-    r.octets_per_frame=r.octets_per_frame+1; // SRP adds 1 octet per frame
+    r.octets_per_frame=r.octets_per_frame+1; // SRP adds 1 octet per frame for bandwidth calculations. See IEEE Std 802.1Q-2011 Clause 35.2.4.2.c
 
     // if it is smaller than 46 then we need to pad it to 46 for minimum
     // ethernet frame size of 68 bytes for bandwidth reservation requirements
