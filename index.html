@@ -228,7 +228,8 @@ document.addEventListener("DOMContentLoaded", init, false);
             <h2 id="info_avb_bw">AVB BW Allocation</h2>
             <p>The AVB BW Allocation defaults to 75%.  This means that the most bandwidth that AVB Time Sensitive Streams can take is 75% of the available bandwidth of each network link.</p>
             <h2 id="info_stream_format">Stream Format</h2>
-            <p></p>
+            <p>There are two stream formats that you can select: AM824 and AAF. AM824 has the options: "non-blocking", "non-blocking (aync)", and "blocking."</p>
+            <p>AM824 supports the transport of 24 bit audio, SMPTE Time Code, and MIDI.</p>
             <h3>AM824 (non blocking)</h3>
             <p>The typical AVB audio device transmits using “AM824 non-blocking, synchronous” mode.  Non-Blocking means it sends one frame every observation period (125µs). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).  </p>
             <h3>AM824 (non blocking, async packetization)</h3>
