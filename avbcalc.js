@@ -214,13 +214,15 @@ function calculate_avb( inputs ) {
         }
         // Add the additional headers/footers for AESGCM
         r.ethernet_frame.aes_gcm_subtype_data = 4;
-        r.ethernet_frame.aes_gcm_key_id = 8
+        r.ethernet_frame.aes_gcm_sender_id = 8;
         r.ethernet_frame.aes_gcm_aes_seed = 8;
+        r.ethernet_frame.aes_gcm_key_id = 8
         r.ethernet_frame.aes_gcm_auth = 8;
 
         r.aes_gcm_overhead = r.ethernet_frame.aes_gcm_subtype_data
-            + r.ethernet_frame.aes_gcm_key_id
+            + r.ethernet_frame.aes_gcm_sender_id
             + r.ethernet_frame.aes_gcm_aes_seed
+            + r.ethernet_frame.aes_gcm_key_id
             + r.ethernet_frame.aes_gcm_auth
             + r.ethernet_frame.aes_gcm_padding;
 
