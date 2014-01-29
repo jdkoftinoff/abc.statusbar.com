@@ -55,7 +55,8 @@ var init = function () {
                 "bw_per_stream_in_bps",
                 "max_stream_count_per_net_link", "total_bw_used_in_bps",
                 "leftover_bw_in_bps",
-                "total_channels_per_net_link"
+                "total_channels_per_net_link",
+                "ethernet_payload_length"
             ];
 
             // Extract the inputs from the form into one object
@@ -104,7 +105,7 @@ document.addEventListener("DOMContentLoaded", init, false);
     </head>
     <body><div id="afui"><div id="header"></div><div id="content" style="">
 	<div class="panel scrollable" title="Inputs" id="page_inputs" selected="selected" data-appbuilder-object="page" style="width: 100%; min-height: 50px;">
-        <div style="text-align:center;">avb.statusbar.com - 2014-01-27</div>
+        <div style="text-align:center;">avb.statusbar.com - 2014-01-28</div>
 		<form style="width: 100%;min-height: 50px;" data-appbuilder-object="form" data-position="static" class="">
 			<div class="select_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="select">
 				<label for="input_network_speed_in_bps">Network Speed</label>
@@ -180,7 +181,11 @@ document.addEventListener("DOMContentLoaded", init, false);
 				<input type="text" style="float:left;" id="output_status" readonly >
 			</div>
 			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
-				<label for="output_octets_per_frame">Octets per frame</label>
+				<label for="output_octets_per_frame">Frame Payload Length</label>
+				<input type="text" style="float:left;" id="output_ethernet_payload_length" readonly >
+			</div>
+			<div class="input_element form_element" style="width:100%;overflow:hidden" data-appbuilder-object="input">
+				<label for="output_octets_per_frame">Octets per frame (inc. all overhead)</label>
 				<input type="text" style="float:left;" id="output_octets_per_frame" readonly >
 			</div>
 			<div class="input_element form_element" style="width: 100%; overflow: hidden;" data-appbuilder-object="input">
