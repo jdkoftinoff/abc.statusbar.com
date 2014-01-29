@@ -229,7 +229,7 @@ document.addEventListener("DOMContentLoaded", init, false);
             <p>The AVB BW Allocation defaults to 75%.  This means that the most bandwidth that AVB Time Sensitive Streams can take is 75% of the available bandwidth of each network link.</p>
             <h2 id="info_stream_format">Stream Format</h2>
             <p>There are two stream formats that can be selected: AM824 and AAF. AM824 has the options for the talker: "non-blocking", "non-blocking (aync)", and "blocking."</p>
-            <p>AM824 supports the transport of 24 bit audio, SMPTE Time Code, and MIDI.</p>
+            <p>AM824 supports the transport of 24 bit linear audio, iec60958 encoded audio (SPDIF and AES3), SMPTE Time Code, and MIDI.</p>
             <p>Regardless of the talker's AM824 packetization, an AVB listener would be able to receive frames using AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
             <h3>AM824 (non blocking)</h3>
             <p>The typical AVB audio device transmits using “AM824 non-blocking, synchronous” mode.  Non-Blocking means it sends one frame every observation period (125µs). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).  </p>
@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", init, false);
             <h3>AAF</h3>
             <p>“AVTP Audio Format” (AAF) is a new packetization format that is defined in IEEE p1722a.  It has lower overhead than AM824, requires each ethernet frame in a stream to be the same size and format, and allows 16 bits, 24 bits at 32 bits per sample, as well as a choice on the number of samples per ethernet frame. Every ethernet frame is always the same size and format.</p>
             <h2 id="info_sample_rate">Sample Rate</h2>
-            <p>All AVB stream formats can support 32 kHz, 44.1 kHz, 48 kHz, 88.2 kHz, 96 kHz, 176.4i kHz, and 192 kHz.  AAF can also support NTSC pulled rates (* 1.001 or * 1/1.001).</p>
+            <p>All AVB stream formats can support 32 kHz, 44.1 kHz, 48 kHz, 88.2 kHz, 96 kHz, 176.4 kHz, and 192 kHz.  AAF can also support NTSC pulled rates (* 1.001 or * 1/1.001).</p>
             <h2 id="info_bits_per_sample">Bits/Sample</h2>
             <p>AM824 formats only support 24 bits per sample.  AAF formats allow packed 16 bits, 24 bits, and 32 bits per sample. For Floating point stream formats, choose 32 bits per sample.</p>
             <h2 id="info_aaf_samples_per_frame">AAF Samples/Frame</h2>
