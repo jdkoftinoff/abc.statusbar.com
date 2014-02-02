@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>AvbBwCalc</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">^
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,15 +17,6 @@
  <style type="text/css">
 </style>
 <script type="text/javascript" >
-$(document).ready( function() {
-            $('form p').css({'border':'1px solid grey','padding':'0.5em'});
-            $('label').css({'width':'95%'});
-            $('div.ui-select').css({'width':'95%'});
-            $('div.ui-input-text').css({'width':'95%'});
-            $('div.ui-checkbox').css({'width':'95%'});
-            $('div.ui-button').css({'clear':'both'});
-        });
-
 </script>
 </head>
 <body>
@@ -42,9 +33,10 @@ $(document).ready( function() {
         </div>
     </div>
 
-    <div data-role="content">
+    <div data-role="header" data-role="content">
+        <div class="content-primary">
         <form>
-            <p>
+            <div data-role="fieldcontain">
                 <label for="input_network_speed_in_bps">Network Speed</label>
                 <select id="input_network_speed_in_bps">
                     <option value="100e6">100baseT</option>
@@ -52,12 +44,12 @@ $(document).ready( function() {
                     <option value="10e9">10 GigE</option>
                     <option value="40e9">40 GigE</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain" >
                 <label for="input_avb_bw">AVB BW Allocation (%)</label>
                 <input type="text" id="input_avb_bw" value="75">
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <label for="input_stream_format">Stream Format</label>
                 <select id="input_stream_format">
                     <option value="AM824nb" selected="">AM824 (non blocking)</option>
@@ -65,8 +57,8 @@ $(document).ready( function() {
                     <option value="AM824b">AM824 (blocking)</option>
                     <option value="AAF">AAF</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <label for="input_sample_rate">Sample Rate</label>
                 <select id="input_sample_rate">
                     <option value="32000">32.0 kHz</option>
@@ -77,16 +69,16 @@ $(document).ready( function() {
                     <option value="176400">176.4 kHz</option>
                     <option value="192000">192 kHz</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <label for="input_bits_per_sample">Bits/Sample</label>
                 <select id="input_bits_per_sample">
                     <option value="16">16</option>
                     <option value="24" selected="">24</option>
                     <option value="32">32</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <label for="input_samples_per_frame">AAF Samples/Frame</label>
                 <select id="input_samples_per_frame">
                     <option value="default" selected="">Default</option>
@@ -98,21 +90,22 @@ $(document).ready( function() {
                     <option value="12">12</option>
                     <option value="24">24</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <label for="input_channel_count">Channel Count</label>
                 <input type="text" id="input_channel_count" value="1">
-            </p>
-            <p>
+            </div>
+            <div data-role="fieldcontain">
                 <input type="checkbox" name="input_aes_gcm_checkbox" id="input_aes_gcm" value="0" >
                 <label for="input_aes_gcm">AES-GCM Encryption</label>
-            </p>
+            </div>
             <div><hr></div>
         </form>
         <center><button id="calculate" onclick="process_abc_form(this)">Calculate</button></center>
     </div>
+    </div>
     <div data-role="footer" style="text-align:center;">
-        See <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
+        Sensitive <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
     </div>
 </div>
 
@@ -130,40 +123,40 @@ $(document).ready( function() {
     </div>
 
     <div data-role="content">
-        <div id="results" class="container scrollable" style="width:100%"  >
-            <div>
+        <form id="results" class="container scrollable" style="width:100%"  >
+            <div data-role="fieldcontain">
                 <label for="output_status">Status</label>
                 <input type="text" id="output_status" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_octets_per_frame">Frame Payload Length</label>
                 <input type="text" id="output_ethernet_payload_length" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_octets_per_frame">Octets per frame (inc. all overhead)</label>
                 <input type="text" id="output_octets_per_frame" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_micros_per_frame">µs per frame</label>
                 <input type="text" id="output_micros_per_frame" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_bw_per_stream_in_bps">bps used per stream</label>
                 <input type="text" id="output_bw_per_stream_in_bps" readonly >
             </div>
-            <div class="" style="width:100%;overflow:hidden" >
+            <div data-role="fieldcontain" >
                 <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
                 <input type="text" id="output_max_stream_count_per_net_link" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
                 <input type="text" id="output_total_bw_used_in_bps" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
                 <input type="text" id="output_leftover_bw_in_bps" readonly >
             </div>
-            <div>
+            <div data-role="fieldcontain">
                 <label for="output_total_channels_per_net_link">Total channels per network link</label>
                 <input type="text" id="output_total_channels_per_net_link" readonly >
             </div>
@@ -189,7 +182,7 @@ $(document).ready( function() {
         </div>
     </div>
     <div data-role="content">
-        <div class="container scrollable" style="width:100%"  >
+        <div class="container scrollable">
             <pre id="output_detail" style="width:100%;height:100%;"></pre>
         </div>
     </div>
