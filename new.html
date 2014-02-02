@@ -14,6 +14,19 @@
 <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="avbcalc.js"></script>
 <script type="text/javascript" charset="utf-8" src="middle.js"></script>
+ <style type="text/css">
+</style>
+<script type="text/javascript" >
+$(document).ready( function() {
+            $('form p').css({'border':'1px solid grey','padding':'0.5em'});
+            $('label').css({'width':'95%'});
+            $('div.ui-select').css({'width':'95%'});
+            $('div.ui-input-text').css({'width':'95%'});
+            $('div.ui-checkbox').css({'width':'95%'});
+            $('div.ui-button').css({'clear':'both'});
+        });
+
+</script>
 </head>
 <body>
 <div data-role="page" id="page_inputs">
@@ -30,8 +43,8 @@
     </div>
 
     <div data-role="content">
-        <form  style="width: 100%;min-height: 50px;"   class="">
-            <div class="select_element form_element" style="width: 100%; overflow: hidden;" >
+        <form>
+            <p>
                 <label for="input_network_speed_in_bps">Network Speed</label>
                 <select id="input_network_speed_in_bps">
                     <option value="100e6">100baseT</option>
@@ -39,12 +52,12 @@
                     <option value="10e9">10 GigE</option>
                     <option value="40e9">40 GigE</option>
                 </select>
-            </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
+            </p>
+            <p>
                 <label for="input_avb_bw">AVB BW Allocation (%)</label>
-                <input type="text" style="float:left;" id="input_avb_bw" value="75">
-            </div>
-            <div class="select_element form_element" style="width: 100%; overflow: hidden;" >
+                <input type="text" id="input_avb_bw" value="75">
+            </p>
+            <p>
                 <label for="input_stream_format">Stream Format</label>
                 <select id="input_stream_format">
                     <option value="AM824nb" selected="">AM824 (non blocking)</option>
@@ -52,8 +65,8 @@
                     <option value="AM824b">AM824 (blocking)</option>
                     <option value="AAF">AAF</option>
                 </select>
-            </div>
-            <div class="select_element form_element" style="width: 100%; overflow: hidden;" >
+            </p>
+            <p>
                 <label for="input_sample_rate">Sample Rate</label>
                 <select id="input_sample_rate">
                     <option value="32000">32.0 kHz</option>
@@ -64,16 +77,16 @@
                     <option value="176400">176.4 kHz</option>
                     <option value="192000">192 kHz</option>
                 </select>
-            </div>
-            <div class="select_element form_element" style="width: 100%; overflow: hidden;" >
+            </p>
+            <p>
                 <label for="input_bits_per_sample">Bits/Sample</label>
                 <select id="input_bits_per_sample">
                     <option value="16">16</option>
                     <option value="24" selected="">24</option>
                     <option value="32">32</option>
                 </select>
-            </div>
-            <div class="select_element form_element" style="width: 100%; overflow: hidden;" >
+            </p>
+            <p>
                 <label for="input_samples_per_frame">AAF Samples/Frame</label>
                 <select id="input_samples_per_frame">
                     <option value="default" selected="">Default</option>
@@ -85,15 +98,15 @@
                     <option value="12">12</option>
                     <option value="24">24</option>
                 </select>
-            </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
+            </p>
+            <p>
                 <label for="input_channel_count">Channel Count</label>
-                <input type="text" style="float:left;" id="input_channel_count" value="1">
-            </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
-                <input type="checkbox" name="input_aes_gcm_checkbox" style="float:left;" id="input_aes_gcm" value="0" >
+                <input type="text" id="input_channel_count" value="1">
+            </p>
+            <p>
+                <input type="checkbox" name="input_aes_gcm_checkbox" id="input_aes_gcm" value="0" >
                 <label for="input_aes_gcm">AES-GCM Encryption</label>
-            </div>
+            </p>
             <div><hr></div>
         </form>
         <center><button id="calculate" onclick="process_abc_form(this)">Calculate</button></center>
@@ -117,43 +130,42 @@
     </div>
 
     <div data-role="content">
-        <div  class="container scrollable" style="width:100%"  >
-            <div class="" style="width: 100%; overflow: hidden;" >
+        <div id="results" class="container scrollable" style="width:100%"  >
+            <div>
                 <label for="output_status">Status</label>
-                <input type="text" style="float:left;" id="output_status" readonly >
+                <input type="text" id="output_status" readonly >
             </div>
-            <div class="" style="width:100%;overflow:hidden" >
+            <div>
                 <label for="output_octets_per_frame">Frame Payload Length</label>
-                <input type="text" style="float:left;" id="output_ethernet_payload_length" readonly >
+                <input type="text" id="output_ethernet_payload_length" readonly >
             </div>
-            <div class="" style="width:100%;overflow:hidden" >
+            <div>
                 <label for="output_octets_per_frame">Octets per frame (inc. all overhead)</label>
-                <input type="text" style="float:left;" id="output_octets_per_frame" readonly >
+                <input type="text" id="output_octets_per_frame" readonly >
             </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
+            <div>
                 <label for="output_micros_per_frame">µs per frame</label>
-                <input type="text" style="float:left;" id="output_micros_per_frame" readonly >
+                <input type="text" id="output_micros_per_frame" readonly >
             </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
+            <div>
                 <label for="output_bw_per_stream_in_bps">bps used per stream</label>
-                <input type="text" style="float:left;" id="output_bw_per_stream_in_bps" readonly >
+                <input type="text" id="output_bw_per_stream_in_bps" readonly >
             </div>
             <div class="" style="width:100%;overflow:hidden" >
                 <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-                <input type="text" style="float:left;" id="output_max_stream_count_per_net_link" readonly >
+                <input type="text" id="output_max_stream_count_per_net_link" readonly >
             </div>
-            <div class="" style="width: 100%; overflow: hidden;" >
+            <div>
                 <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
-                <input type="text" style="float:left;" id="output_total_bw_used_in_bps" readonly >
+                <input type="text" id="output_total_bw_used_in_bps" readonly >
             </div>
-
-            <div class="" style="width:100%;overflow:hidden" >
+            <div>
                 <label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
-                <input type="text" style="float:left;" id="output_leftover_bw_in_bps" readonly >
+                <input type="text" id="output_leftover_bw_in_bps" readonly >
             </div>
-            <div class="" style="width:100%;overflow:hidden" >
+            <div>
                 <label for="output_total_channels_per_net_link">Total channels per network link</label>
-                <input type="text" style="float:left;" id="output_total_channels_per_net_link" readonly >
+                <input type="text" id="output_total_channels_per_net_link" readonly >
             </div>
         </div>
     </div>
