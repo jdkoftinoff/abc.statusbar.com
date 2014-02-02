@@ -3,32 +3,8 @@ CACHE MANIFEST
 CACHE:
 ./index.html
 ./avbcalc.js
-./css/af.ui.css
-./css/icons.css
-./js/appframework.min.js
-./js/appframework.ui.min.js
-./plugins/af.8tiles.js
-./plugins/af.actionsheet.js
-./plugins/af.css3animate.js
-./plugins/af.desktopBrowsers.js
-./plugins/af.passwordBox.js
-./plugins/af.popup.js
-./plugins/af.scroller.js
-./plugins/af.selectBox.js
-./plugins/af.slidemenu.js
-./plugins/af.touchEvents.js
-./plugins/af.touchLayer.js
-./plugins/css/accordion.css
-./plugins/css/af.accordion.css
-./plugins/css/af.actionsheet.css
-./plugins/css/af.popup.css
-./plugins/css/af.scroller.css
-./plugins/css/af.selectBox.css
-./plugins/css/tabs.css
-./ui/appframework.ui.min.js
-./ui/transitions/fade.js
-./ui/transitions/flip.js
-./ui/transitions/pop.js
-./ui/transitions/slide.js
-./ui/transitions/slideDown.js
-./ui/transitions/slideUp.js
+./middle.js
+./jquery.mobile-1.4.0.min.css s
+./jquery.mobile-1.4.0.min.js s
+./jquery-1.11.0.min.js
+
