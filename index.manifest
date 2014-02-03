@@ -222,7 +222,6 @@ CACHE:
 ./images/icons-svg/video-black.svg
 ./images/icons-svg/video-white.svg
 ./index.html
-./index.manifest
 ./jdks.png
 ./js/jquery-1.10.2.js
 ./js/jquery-ui-1.10.4.custom.js
