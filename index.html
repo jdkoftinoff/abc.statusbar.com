@@ -24,7 +24,7 @@
 <div data-role="page" id="page_inputs">
     <div data-role="header">
         <h1>Avb Bw Calc</h1>
-        <div data-role="navbar">
+        <div data-role="navbar" data-position="fixed">
             <ul>
                 <li><a href="#" class="ui-btn-active ui-state-persist" data-icon="home">Inputs</a></li>
                 <li><a href="#page_answers" data-icon="star">Answers</a></li>
@@ -130,6 +130,26 @@
                 <input type="text" id="output_status" readonly >
             </div>
             <div data-role="fieldcontain">
+                <label for="output_total_channels_per_net_link">Total channels per network link</label>
+                <input type="text" id="output_total_channels_per_net_link" readonly >
+            </div>
+            <div data-role="fieldcontain">
+                <label for="output_channels_per_stream">Total channels per stream</label>
+                <input type="text" id="output_channels_per_stream" readonly >
+            </div>
+            <div data-role="fieldcontain" >
+                <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
+                <input type="text" id="output_max_stream_count_per_net_link" readonly >
+            </div>
+            <div data-role="fieldcontain">
+                <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
+                <input type="text" id="output_total_bw_used_in_bps" readonly >
+            </div>
+            <div data-role="fieldcontain">
+                <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
+                <input type="text" id="output_leftover_bw_in_bps" readonly >
+            </div>
+            <div data-role="fieldcontain">
                 <label for="output_octets_per_frame">Frame Payload Length</label>
                 <input type="text" id="output_ethernet_payload_length" readonly >
             </div>
@@ -145,23 +165,7 @@
                 <label for="output_bw_per_stream_in_bps">bps used per stream</label>
                 <input type="text" id="output_bw_per_stream_in_bps" readonly >
             </div>
-            <div data-role="fieldcontain" >
-                <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-                <input type="text" id="output_max_stream_count_per_net_link" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
-                <input type="text" id="output_total_bw_used_in_bps" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_leftover_bw_in_bps">Leftover bw in bps</label>
-                <input type="text" id="output_leftover_bw_in_bps" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_total_channels_per_net_link">Total channels per network link</label>
-                <input type="text" id="output_total_channels_per_net_link" readonly >
-            </div>
-        </div>
+                    </div>
     </div>
 
     <div data-role="footer" style="text-align:center;">

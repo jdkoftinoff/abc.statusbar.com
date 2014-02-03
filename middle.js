@@ -45,7 +45,8 @@ function process_abc_form(item) {
         "max_stream_count_per_net_link", "total_bw_used_in_bps",
         "leftover_bw_in_bps",
         "total_channels_per_net_link",
-        "ethernet_payload_length"
+        "ethernet_payload_length",
+        "channels_per_stream"
     ];
 
     // Extract the inputs from the form into one object

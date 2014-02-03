@@ -42,7 +42,7 @@ outputs:
 
         "status", "octets_per_frame", "micros_per_frame",
         "max_stream_count_per_net_link", "leftover_bw_in_bps",
-        "total_channels_per_net_link", "octet_times"
+        "total_channels_per_net_link", "octet_times", "channels_per_stream"
 
 */
 
@@ -93,7 +93,9 @@ function calculate_avb( inputs ) {
 
     r.ethernet_frame = {};
 
-    // Default to good status
+    r.channels_per_stream = inputs.channel_count;
+
+    // Default to not good status
     r.status = "Bad Format";
 
     // all components of the frame
@@ -278,7 +280,7 @@ function calculate_avb( inputs ) {
     r.total_bw_used_in_bps = (r.bw_per_stream_in_bps * r.max_stream_count_per_net_link );
 
     // What bandwidth is left over?
-    r.leftover_bw_in_bps = inputs.network_speed_in_bps - r.total_bw_used_in_bps;
+    r.leftover_bw_in_bps = (inputs.network_speed_in_bps * inputs.avb_bw * 0.01) - r.total_bw_used_in_bps;
 
     // embed the inputs in the result for reference
     r.inputs = inputs;
