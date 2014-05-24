@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html manifest="cache.manifest">
 <head>
-<title>AvbBwCalc</title>
+<title>AvbBwCalc 2014-05-23</title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -23,7 +23,7 @@
 <body>
 <div data-role="page" id="page_inputs">
     <div data-role="header">
-        <h1>Avb Bw Calc</h1>
+        <h1>Avb Bw Calc - 2014-05-23</h1>
         <div data-role="navbar" data-position="fixed">
             <ul>
                 <li><a href="#" class="ui-btn-active ui-state-persist" data-icon="home">Inputs</a></li>
@@ -35,6 +35,7 @@
     </div>
 
     <div data-role="header" data-role="content">
+        <h2>Stream Properties</h2>
         <div class="content-primary">
         <form>
             <div data-role="fieldcontain">
@@ -93,12 +94,12 @@
                 </select>
             </div>
             <div data-role="fieldcontain">
-                <label for="input_channel_count">Channel Count</label>
-                <input type="range" name="input_channel_count" id="input_channel_count" value="1" min="1" max="64"  />
+                <label for="input_channel_count">Stream Channel Count</label>
+                <input type="range" name="input_channel_count" id="input_channel_count" value="1" min="1" max="768"  />
             </div>
             <div data-role="fieldcontain">
-                <input type="checkbox" name="input_aes_gcm_checkbox" id="input_aes_gcm" value="0" >
-                <label for="input_aes_gcm">AES-GCM Encryption</label>
+                <input type="checkbox" name="input_aes_siv_checkbox" id="input_aes_siv" value="0" >
+                <label for="input_aes_siv">AES-SIV Encryption</label>
             </div>
             <div><hr></div>
         </form>
@@ -112,7 +113,7 @@
 
 <div data-role="page" id="page_answers">
     <div data-role="header">
-        <h1>Avb Bw Calc</h1>
+        <h1>Avb Bw Calc - 2014-05-23</h1>
         <div data-role="navbar">
             <ul>
                 <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
@@ -176,7 +177,7 @@
 
 <div data-role="page" id="page_details">
     <div data-role="header">
-        <h1>Avb Bw Calc</h1>
+        <h1>Avb Bw Calc - 2014-05-23</h1>
         <div data-role="navbar">
             <ul>
                 <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
@@ -200,7 +201,7 @@
 
 <div data-role="page" id="page_info">
     <div data-role="header">
-        <h1>Avb Bw Calc</h1>
+        <h1>Avb Bw Calc - 2014-05-23</h1>
         <div data-role="navbar">
             <ul>
                 <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
@@ -237,8 +238,8 @@
             <p>AM824 packetization allows one ethernet frame per stream per observation interval (125µs).  AAF format supports multiple ethernet frames per observation interval, allowing for more channels per stream.</p>
             <h2 id="info_channel_count">Channel Count</h2>
             <p>The channel count.</p>
-            <h2 id="info_aes_gcm_encryption">AES-GCM Encryption</h2>
-            <p>IEEE p1722a support AES-GCM encrypted AVB streams.  When the ethernet frame is encrypted this adds some overhead to the ethernet frame.</p>
+            <h2 id="info_aes_siv_encryption">AES-SIV Encryption</h2>
+            <p>IEEE p1722a supports <a href="http://tools.ietf.org/html/rfc5297">AES-SIV</a> encrypted AVB streams.  When the ethernet frame is encrypted this adds some overhead to the ethernet frame.</p>
         </div>
     </div>
     <div data-role="footer" style="text-align:center;">

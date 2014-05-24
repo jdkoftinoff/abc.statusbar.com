@@ -1,6 +1,6 @@
 
 /*
-  AVB Bandwidth Calculator, Version 2014-01-25
+  AVB Bandwidth Calculator, Version 2014-05-23
 
   Copyright (c) 2014, J.D. Koftinoff Software, Ltd. <jeffk@jdkoftinoff.com>
   All rights reserved.
@@ -36,7 +36,7 @@
 /*
 inputs:
         "network_speed_in_bps", "avb_bw", "stream_format", "sample_rate",
-        "bits_per_sample", "channel_count", "async", "aes_gcm"
+        "bits_per_sample", "channel_count", "async", "aes_siv"
 
 outputs:
 
@@ -205,31 +205,26 @@ function calculate_avb( inputs ) {
         +r.ethernet_frame.audio_payload;
 
     // Is the stream encrypted?
-    if( inputs.aes_gcm==1 ) {
-        // If the stream is encrypted with AES_GCM then the payload needs to be
-        // a multiple of 16 bytes and then the AES_GCM header/footer overhead added
-        r.ethernet_frame.aes_gcm_padding = 0;
-        var aes_gcm_block_size=16;
-        var remainder = r.ethernet_payload_length % aes_gcm_block_size;
+    if( inputs.aes_siv==1 ) {
+        // If the stream is encrypted with AES_SIV then the payload needs to be
+        // a multiple of 16 bytes and then the AES_SIV header/footer overhead added
+        r.ethernet_frame.aes_siv_padding = 0;
+        var aes_siv_block_size=16;
+        var remainder = r.ethernet_payload_length % aes_siv_block_size;
         if( remainder>0 ) {
-            r.ethernet_frame.aes_gcm_padding = aes_gcm_block_size-remainder;
+            r.ethernet_frame.aes_siv_padding = aes_siv_block_size-remainder;
         }
-        // Add the additional headers/footers for AESGCM. See IEEE p1722a Draft 7
-        r.ethernet_frame.aes_gcm_subtype_data = 4;
-        r.ethernet_frame.aes_gcm_sender_id = 8;
-        r.ethernet_frame.aes_gcm_aes_seed = 8;
-        r.ethernet_frame.aes_gcm_key_id = 8
-        r.ethernet_frame.aes_gcm_auth = 8;
+        // Add the additional headers/footers for AES_SIV. See IEEE p1722a Draft 8
+        r.ethernet_frame.aes_siv_subtype_data = 4;
+        r.ethernet_frame.aes_siv_key_id = 8;
+        r.ethernet_frame.aes_siv_iv = 16;
 
-        r.aes_gcm_overhead = r.ethernet_frame.aes_gcm_subtype_data
-            + r.ethernet_frame.aes_gcm_sender_id
-            + r.ethernet_frame.aes_gcm_aes_seed
-            + r.ethernet_frame.aes_gcm_key_id
-            + r.ethernet_frame.aes_gcm_auth
-            + r.ethernet_frame.aes_gcm_padding;
+        r.aes_siv_overhead = r.ethernet_frame.aes_siv_subtype_data
+            + r.ethernet_frame.aes_siv_key_id
+            + r.ethernet_frame.aes_siv_iv;
 
-        r.ethernet_payload_length += r.aes_gcm_overhead;
-        r.octets_per_frame += r.aes_gcm_overhead;
+        r.ethernet_payload_length += r.aes_siv_overhead;
+        r.octets_per_frame += r.aes_siv_overhead;
     }
 
     r.octets_per_frame=r.octets_per_frame+1; // SRP adds 1 octet per frame for bandwidth calculations. See IEEE Std 802.1Q-2011 Clause 35.2.4.2.c

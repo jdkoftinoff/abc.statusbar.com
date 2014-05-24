@@ -1,5 +1,5 @@
 /*
-  AVB Bandwidth Calculator, Version 2014-02-02
+  AVB Bandwidth Calculator, Version 2014-05-23
 
   Copyright (c) 2014, J.D. Koftinoff Software, Ltd. <jeffk@jdkoftinoff.com>
   All rights reserved.
@@ -36,7 +36,7 @@ function process_abc_form(item) {
     // The list of input parameters
     var input_items = [
         "network_speed_in_bps", "avb_bw", "stream_format", "sample_rate",
-        "bits_per_sample", "channel_count", "aes_gcm", "samples_per_frame" ];
+        "bits_per_sample", "channel_count", "aes_siv", "samples_per_frame" ];
 
     // The list of output parameters
     var output_items = [
