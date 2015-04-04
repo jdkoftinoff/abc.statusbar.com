@@ -43,6 +43,7 @@ outputs:
         "status", "octets_per_frame", "micros_per_frame",
         "max_stream_count_per_net_link", "leftover_bw_in_bps",
         "total_channels_per_net_link", "octet_times", "channels_per_stream"
+        "efficiency"
 
 */
 
@@ -108,6 +109,7 @@ function calculate_avb( inputs ) {
     r.ethernet_frame.aaf_header = 0;
     r.ethernet_frame.ethernet_fcs = 4;
     r.ethernet_frame.padding = 0;
+    r.efficiency = 0;
 
     // Determine samples_per_frame, syt_interval, octets_per_sample, frames_per_observation_interval,
     // and observation_intervals_per_second values based on stream format and other options
@@ -286,6 +288,10 @@ function calculate_avb( inputs ) {
     } else {
         r.total_channels_per_net_link = r.max_stream_count_per_net_link * inputs.channel_count;
     }
+    
+    // calculate the efficiency in percent: audio payload size / total size including overhead
+    r.efficiency = 100.0 * (r.ethernet_frame.audio_payload - 1) / r.octets_per_frame;
+    
     return r;
 }
 
