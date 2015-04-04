@@ -362,7 +362,8 @@ function calculate_avb( inputs ) {
     
     // calculate the efficiency in percent: audio payload bps / nominal packet octet bps
     r.audio_bps = inputs.channel_count * r.octets_per_sample * inputs.sample_rate * 8;
-    r.efficiency = 100.0 * r.audio_bps / r.nominal_bw_per_stream_in_bps;
+    r.efficiency = 100 * 100.0 * r.audio_bps / r.nominal_bw_per_stream_in_bps;
+    r.efficiency = Math.round(r.efficiency) / 100.0;
     
     return r;
 }
