@@ -93,7 +93,8 @@ function calculate_avb( inputs ) {
     var r={};
 
     r.ethernet_frame = {};
-
+    r.nominal_ethernet_frame = {};
+    
     r.channels_per_stream = inputs.channel_count;
 
     // Default to not good status
@@ -109,6 +110,20 @@ function calculate_avb( inputs ) {
     r.ethernet_frame.aaf_header = 0;
     r.ethernet_frame.ethernet_fcs = 4;
     r.ethernet_frame.padding = 0;
+
+    r.nominal_ethernet_frame.interframe_gap = 12;
+    r.nominal_ethernet_frame.preambles_and_sfd = 8;
+    r.nominal_ethernet_frame.ethernet_header = 14;
+    r.nominal_ethernet_frame.vlan_tag = 4;
+    r.nominal_ethernet_frame.avtpdu_header = 24;
+    r.nominal_ethernet_frame.cip_header = 0;
+    r.nominal_ethernet_frame.aaf_header = 0;
+    r.nominal_ethernet_frame.ethernet_fcs = 4;
+    r.nominal_ethernet_frame.padding = 0;
+
+    r.octets_per_frame = 0;
+    r.nominal_octets_per_frame = 0;
+    
     r.efficiency = 0;
 
     // Determine samples_per_frame, syt_interval, octets_per_sample, frames_per_observation_interval,
@@ -118,12 +133,15 @@ function calculate_avb( inputs ) {
         // AM824 non blocking mode may be asynchronous or synchronous
         if( inputs.stream_format=="AM824nb-async" ) {
            r.samples_per_frame = am824nb_async_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
+           r.nominal_samples_per_frame = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
         } else {
            r.samples_per_frame = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
+           r.nominal_samples_per_frame = r.samples_per_frame;
         }
 
         // AM824 always has a cip_header of 8 octets
         r.ethernet_frame.cip_header = 8;
+        r.nominal_ethernet_frame.cip_header = 8;
 
         // SYT_INTERVAL is fixed based on sample rate
         r.syt_interval = am824_syt_interval_from_sample_rate[ inputs.sample_rate ];
@@ -137,6 +155,9 @@ function calculate_avb( inputs ) {
         // Class A is 8000 observation intervals per second
         r.observation_intervals_per_second = 8000;
 
+        r.nominal_frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
+        r.frames_per_second = r.frames_per_observation_interval * r.observation_intervals_per_second;
+        
     } else if ( inputs.stream_format == "AM824b" ) {
         r.status = "success";
 
@@ -145,7 +166,8 @@ function calculate_avb( inputs ) {
 
         // Blocking mode has a fixed number of samples per frame when it does send a frame
         r.samples_per_frame = am824b_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
-
+        r.nominal_samples_per_frame = r.samples_per_frame;
+        
         // SYT_INTERVAL is fixed based on sample rate
         r.syt_interval = am824_syt_interval_from_sample_rate[ inputs.sample_rate ];
 
@@ -157,6 +179,9 @@ function calculate_avb( inputs ) {
 
         // Class A is 8000 observation intervals per second
         r.observation_intervals_per_second = 8000;
+
+        r.nominal_frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
+        r.frames_per_second = r.nominal_frames_per_second;
 
     } else if ( inputs.stream_format == "AAF" ) {
         r.status = "success";
@@ -166,7 +191,7 @@ function calculate_avb( inputs ) {
 
         // AAF header is fully contained in 1722 header
         r.ethernet_frame.aaf_header = 0;
-
+        r.nominal_ethernet_frame.aaf_header = 0;
 
         // Class A is 8000 observation intervals per second
         r.observation_intervals_per_second = 8000;
@@ -184,18 +209,30 @@ function calculate_avb( inputs ) {
             r.samples_per_frame = r.samples_per_observation_interval;
         }
 
+        r.nominal_samples_per_frame = r.samples_per_frame;
+        
         // From the samples per frame, calculate how many frames per observation interval are needed to be sent
         r.frames_per_observation_interval = Math.ceil( r.samples_per_observation_interval / r.samples_per_frame );
+
+        r.frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
+        r.nominal_frames_per_second = r.frames_per_second;
     }
 
     // Calculate the audio payload octets
     r.ethernet_frame.audio_payload = r.octets_per_sample * r.samples_per_frame * inputs.channel_count;
+    r.nominal_ethernet_frame.audio_payload = r.octets_per_sample * r.nominal_samples_per_frame * inputs.channel_count;
 
     // Calculate the total octets for the frame
     r.octets_per_frame = 0;
     for( var i in r.ethernet_frame ) {
         if( r.ethernet_frame[i] ) {
             r.octets_per_frame += r.ethernet_frame[i];
+        }
+    }
+
+    for( var i in r.nominal_ethernet_frame ) {
+        if( r.nominal_ethernet_frame[i] ) {
+            r.nominal_octets_per_frame += r.nominal_ethernet_frame[i];
         }
     }
 
@@ -206,27 +243,51 @@ function calculate_avb( inputs ) {
         +r.ethernet_frame.aaf_header
         +r.ethernet_frame.audio_payload;
 
+    r.nominal_ethernet_payload_length =
+        r.nominal_ethernet_frame.avtpdu_header
+        +r.nominal_ethernet_frame.cip_header
+        +r.nominal_ethernet_frame.aaf_header
+        +r.nominal_ethernet_frame.audio_payload;
+
     // Is the stream encrypted?
     if( inputs.aes_siv==1 ) {
         // If the stream is encrypted with AES_SIV then the payload needs to be
         // a multiple of 16 bytes and then the AES_SIV header/footer overhead added
         r.ethernet_frame.aes_siv_padding = 0;
+        r.nominal_ethernet_frame.aes_siv_padding = 0;
         var aes_siv_block_size=16;
         var remainder = r.ethernet_payload_length % aes_siv_block_size;
         if( remainder>0 ) {
             r.ethernet_frame.aes_siv_padding = aes_siv_block_size-remainder;
         }
+
+        var nominal_remainder = r.nominal_ethernet_payload_length % aes_siv_block_size;
+        if( nominal_remainder>0 ) {
+            r.nominal_ethernet_frame.aes_siv_padding = aes_siv_block_size-nominal_remainder;
+        }
+
         // Add the additional headers/footers for AES_SIV. See IEEE p1722a Draft 8
         r.ethernet_frame.aes_siv_subtype_data = 4;
-        r.ethernet_frame.aes_siv_key_id = 8;
-        r.ethernet_frame.aes_siv_iv = 16;
+        r.nominal_ethernet_frame.aes_siv_subtype_data = 4;
 
+        r.ethernet_frame.aes_siv_key_id = 8;
+        r.nominal_ethernet_frame.aes_siv_key_id = 8;
+        
+        r.ethernet_frame.aes_siv_iv = 16;
+        r.nominal_ethernet_frame.aes_siv_iv = 16;
+        
         r.aes_siv_overhead = r.ethernet_frame.aes_siv_subtype_data
             + r.ethernet_frame.aes_siv_key_id
             + r.ethernet_frame.aes_siv_iv;
 
+        r.nominal_aes_siv_overhead = r.nominal_ethernet_frame.aes_siv_subtype_data
+            + r.nominal_ethernet_frame.aes_siv_key_id
+            + r.nominal_ethernet_frame.aes_siv_iv;
+
         r.ethernet_payload_length += r.aes_siv_overhead;
-        r.octets_per_frame += r.aes_siv_overhead;
+        r.nominal_ethernet_payload_length += r.nominal_aes_siv_overhead;
+
+        r.nominal_octets_per_frame += r.nominal_aes_siv_overhead;
     }
 
     r.octets_per_frame=r.octets_per_frame+1; // SRP adds 1 octet per frame for bandwidth calculations. See IEEE Std 802.1Q-2011 Clause 35.2.4.2.c
@@ -241,6 +302,12 @@ function calculate_avb( inputs ) {
         r.ethernet_payload_length += r.ethernet_frame.padding;
     }
 
+    if( r.nominal_ethernet_payload_length<46 ) {
+        r.nominal_ethernet_frame.padding = 46 - r.nominal_ethernet_payload_length;
+        r.nominal_octets_per_frame += r.nominal_ethernet_frame.padding;
+        r.nominal_ethernet_payload_length += r.nominal_ethernet_frame.padding;
+    }
+
     // If the payload length > 1500 then this is an error
     if( r.ethernet_payload_length > 1500 ) {
         r.status = "Err: Payload > 1500";
@@ -251,9 +318,12 @@ function calculate_avb( inputs ) {
 
     // microseconds per ethernet frame
     r.micros_per_frame=r.octets_per_frame * r.micros_per_octet;
+    
+    r.nominal_micros_per_frame=r.nominal_octets_per_frame * r.micros_per_octet;
 
     // microseconds taken by the frames for this stream per observation interval
     r.micros_spent_per_observation_interval = r.micros_per_frame * r.frames_per_observation_interval;
+    r.nominal_micros_spent_per_observation_interval = r.nominal_micros_per_frame * r.frames_per_observation_interval;
 
     if( inputs.avb_bw<1 || inputs.avb_bw>99 ) {
         r.status = "Invalid AVB Bandwidth";
@@ -268,7 +338,8 @@ function calculate_avb( inputs ) {
     }
 
     // Add up all the octet times for all bandwidth reserved for a second to calc the bandwidth per stream
-    r.bw_per_stream_in_bps = (8*r.octets_per_frame*r.frames_per_observation_interval*r.observation_intervals_per_second);
+    r.bw_per_stream_in_bps = (8*r.octets_per_frame*r.frames_per_second);
+    r.nominal_bw_per_stream_in_bps = (8*r.nominal_octets_per_frame*r.nominal_frames_per_second);
 
     // How many streams can we fit on this link?
     r.max_stream_count_per_net_link = Math.floor( inputs.network_speed_in_bps * inputs.avb_bw*0.01 / r.bw_per_stream_in_bps);
@@ -289,8 +360,9 @@ function calculate_avb( inputs ) {
         r.total_channels_per_net_link = r.max_stream_count_per_net_link * inputs.channel_count;
     }
     
-    // calculate the efficiency in percent: audio payload size / total size including overhead
-    r.efficiency = 100.0 * (r.ethernet_frame.audio_payload - 1) / r.octets_per_frame;
+    // calculate the efficiency in percent: audio payload bps / nominal packet octet bps
+    r.audio_bps = inputs.channel_count * r.octets_per_sample * inputs.sample_rate * 8;
+    r.efficiency = 100.0 * r.audio_bps / r.nominal_bw_per_stream_in_bps;
     
     return r;
 }

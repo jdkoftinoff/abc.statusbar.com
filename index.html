@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html manifest="cache1.manifest">
 <head>
-<title>AvbBwCalc 2015-04-04</title>
+<title>AvbBwCalc 2015-04-04a</title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,8 +53,8 @@
             <div data-role="fieldcontain">
                 <label for="input_stream_format">Stream Format</label>
                 <select id="input_stream_format">
-                    <option value="AM824nb" selected="">AM824 (non blocking)</option>
-                    <option value="AM824nb-async">AM824 (non blocking, Async Packetization)</option>
+                    <option value="AM824nb">AM824 (non blocking)</option>
+                    <option value="AM824nb-async" selected="">AM824 (non blocking, Async Packetization)</option>
                     <option value="AM824b">AM824 (blocking)</option>
                     <option value="AAF">AAF</option>
                 </select>
@@ -150,15 +150,15 @@
                 <input type="text" id="output_leftover_bw_in_bps" readonly >
             </div>
             <div data-role="fieldcontain">
-                <label for="output_octets_per_frame">Frame Payload Length</label>
+                <label for="output_octets_per_frame">Largest Frame Payload Length</label>
                 <input type="text" id="output_ethernet_payload_length" readonly >
             </div>
             <div data-role="fieldcontain">
-                <label for="output_octets_per_frame">Octets per frame (inc. all overhead)</label>
+                <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
                 <input type="text" id="output_octets_per_frame" readonly >
             </div>
             <div data-role="fieldcontain">
-                <label for="output_micros_per_frame">µs per frame</label>
+                <label for="output_micros_per_frame">Largest µs per frame</label>
                 <input type="text" id="output_micros_per_frame" readonly >
             </div>
             <div data-role="fieldcontain">
@@ -166,7 +166,7 @@
                 <input type="text" id="output_bw_per_stream_in_bps" readonly >
             </div>
             <div data-role="fieldcontain">
-                <label for="output_efficency">Efficiency in % (audio size / total frame size) </label>
+                <label for="output_efficency">Efficiency in % (audio payload bps / nominal packet octet bps) </label>
                 <input type="text" id="output_efficiency" readonly >
             </div>
                     </div>
