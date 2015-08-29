@@ -220,12 +220,13 @@
             <p>This AVB Bandwidth Calculator is provided by Jeff Koftinoff <a href="mailto:jeff.koftinoff@gmail.com">&lt;jeff.koftinoff@gmail.com&gt;</a></p>
             <p>See <a href="http://avb.statusbar.com/">avb.statusbar.com</a> for more information</p>
             <h2 id="info_avb_bw">AVB BW Allocation</h2>
-            <p>The AVB BW Allocation defaults to 75%.  This means that the most bandwidth that AVB Time Sensitive Streams can take is 75% of the available bandwidth of each network link.</p>
+            <p>The bandwidth allocation for AVB (AVB BW) defaults to 75%. At this setting the most bandwidth that AVB Time Sensitive Streams will take is 75% of the available bandwidth of each network link.</p>
             <h2 id="info_stream_format">Stream Format</h2>
-            <p>There are two stream formats that can be selected: AM824 and AAF. AM824 has the options for the talker: "non-blocking", "non-blocking (aync)", and "blocking."</p>
-            <p>AM824 supports the transport of 24 bit linear audio, iec60958 encoded audio (SPDIF and AES3), SMPTE Time Code, and MIDI.</p>
-            <p>Regardless of the talker's AM824 packetization, an AVB listener would be able to receive frames using AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
-            <h3>AM824 (non blocking)</h3>
+<p>There are two audio stream formats used by AVB: AM824 and AAF.</p>
+<p>AM824 supports the transport of 24 bit linear audio, iec60958 encoded audio (SPDIF and AES3), SMPTE Time Code, and MIDI.</p>
+<p>AM824 has three options for the talker: "non-blocking (sync)", "non-blocking (aync)", and "blocking."</p>
+<p>Regardless of the talker's AM824 packetization, an AVB listener is required to receive frames using any of the three options: AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
+            <h3>AM824 (non blocking, synchronous)</h3>
             <p>The typical AVB audio device transmits using “AM824 non-blocking, synchronous” mode.  Non-Blocking means it sends one frame every observation period (125µs). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).  </p>
             <h3>AM824 (non blocking, async packetization)</h3>
             <p>“AM824 non-blocking, asynchronous” mode means that the transmitter may send an occasional ethernet frame with one extra or one less sample due to the packetizer being asynchronous to the transmitter's observation interval.  Devices that handle more than one clock domain but have one packetizer typically use this format. Because it can send the occasional ethernet frame with 7 samples @ 48 kHz or 13 samples @ 96 kHz, it needs to reserve enough bandwidth to allow it to do so. The Apple Mac transmits AM824 non-blocking, asynchronous mode.</p>
