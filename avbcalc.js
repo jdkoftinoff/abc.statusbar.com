@@ -36,7 +36,8 @@
 /*
 inputs:
         "network_speed_in_bps", "avb_bw", "stream_format", "sample_rate",
-        "bits_per_sample", "channel_count", "async", "aes_siv"
+        "bits_per_sample", "channel_count", "async", "aes_siv",
+        "observation_intervals_per_second"
 
 outputs:
 
@@ -153,7 +154,7 @@ function calculate_avb( inputs ) {
         r.frames_per_observation_interval = 1;
 
         // Class A is 8000 observation intervals per second
-        r.observation_intervals_per_second = 8000;
+        r.observation_intervals_per_second = inputs.observation_intervals_per_second
 
         r.nominal_frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
         r.frames_per_second = r.frames_per_observation_interval * r.observation_intervals_per_second;
@@ -178,7 +179,7 @@ function calculate_avb( inputs ) {
         r.frames_per_observation_interval = 1;
 
         // Class A is 8000 observation intervals per second
-        r.observation_intervals_per_second = 8000;
+        r.observation_intervals_per_second = inputs.observation_intervals_per_second;
 
         r.nominal_frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
         r.frames_per_second = r.nominal_frames_per_second;
@@ -194,7 +195,7 @@ function calculate_avb( inputs ) {
         r.nominal_ethernet_frame.aaf_header = 0;
 
         // Class A is 8000 observation intervals per second
-        r.observation_intervals_per_second = 8000;
+        r.observation_intervals_per_second = inputs.observation_intervals_per_second;
 
         // AAF allows 16,24, and 32 bit bits per sample
         r.octets_per_sample = inputs.bits_per_sample / 8;

@@ -36,7 +36,8 @@ function process_abc_form(item) {
     // The list of input parameters
     var input_items = [
         "network_speed_in_bps", "avb_bw", "stream_format", "sample_rate",
-        "bits_per_sample", "channel_count", "aes_siv", "samples_per_frame" ];
+        "bits_per_sample", "channel_count", "aes_siv", "samples_per_frame",
+        "observation_interval_freq" ];
 
     // The list of output parameters
     var output_items = [
