@@ -46,10 +46,11 @@
                     <option value="100e9">100 Gbps</option>
                 </select>
 
-                <label for="input_avb_bw">
-                    AVB BW Allocation: <output id="avb_bw_display">75</output>%
-                </label>
-                <input type="range" id="input_avb_bw" name="avb_bw" min="5" max="95" value="75">
+                <label for="input_avb_bw">AVB BW Allocation (%)</label>
+                <div class="slider-with-input">
+                    <input type="range" id="input_avb_bw" name="avb_bw" min="5" max="95" value="75">
+                    <input type="number" id="input_avb_bw_number" min="5" max="95" value="75" aria-label="AVB BW Allocation percentage">
+                </div>
 
                 <label for="input_stream_format">Stream Format</label>
                 <select id="input_stream_format" name="stream_format">
@@ -118,10 +119,11 @@
                     <option value="1024">1024</option>
                 </select>
 
-                <label for="input_channel_count">
-                    Channels Per Stream: <output id="channel_count_display">1</output>
-                </label>
-                <input type="range" id="input_channel_count" name="channel_count" min="1" max="738" value="1">
+                <label for="input_channel_count">Channels Per Stream</label>
+                <div class="slider-with-input">
+                    <input type="range" id="input_channel_count" name="channel_count" min="1" max="738" value="1">
+                    <input type="number" id="input_channel_count_number" min="1" max="738" value="1" aria-label="Channels per stream">
+                </div>
 
                 <fieldset>
                     <label>

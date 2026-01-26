@@ -59,10 +59,22 @@ article > header {
     margin-bottom: 1rem;
 }
 
-/* Slider value display */
-output {
-    font-weight: 600;
-    color: var(--pico-primary);
+/* Slider with number input */
+.slider-with-input {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.slider-with-input input[type="range"] {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.slider-with-input input[type="number"] {
+    width: 5rem;
+    margin-bottom: 0;
+    text-align: center;
 }
 
 /* Calculate button - make it prominent */

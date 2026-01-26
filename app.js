@@ -83,26 +83,55 @@
     }
 
     /**
-     * Initialize range slider live value display
+     * Sync a range slider with a number input
+     */
+    function syncSliderAndNumber(sliderId, numberId) {
+        const slider = document.getElementById(sliderId);
+        const numberInput = document.getElementById(numberId);
+
+        if (!slider || !numberInput) return;
+
+        // Sync number input when slider changes
+        slider.addEventListener('input', () => {
+            numberInput.value = slider.value;
+        });
+
+        // Sync slider when number input changes
+        numberInput.addEventListener('input', () => {
+            // Clamp value to min/max
+            let val = parseInt(numberInput.value, 10);
+            const min = parseInt(slider.min, 10);
+            const max = parseInt(slider.max, 10);
+
+            if (!isNaN(val)) {
+                if (val < min) val = min;
+                if (val > max) val = max;
+                slider.value = val;
+            }
+        });
+
+        // On blur, enforce valid value in number input
+        numberInput.addEventListener('blur', () => {
+            let val = parseInt(numberInput.value, 10);
+            const min = parseInt(slider.min, 10);
+            const max = parseInt(slider.max, 10);
+
+            if (isNaN(val) || val < min) {
+                val = min;
+            } else if (val > max) {
+                val = max;
+            }
+            numberInput.value = val;
+            slider.value = val;
+        });
+    }
+
+    /**
+     * Initialize range sliders with synced number inputs
      */
     function initSliders() {
-        // AVB BW slider
-        const avbBwSlider = document.getElementById('input_avb_bw');
-        const avbBwDisplay = document.getElementById('avb_bw_display');
-        if (avbBwSlider && avbBwDisplay) {
-            avbBwSlider.addEventListener('input', () => {
-                avbBwDisplay.value = avbBwSlider.value;
-            });
-        }
-
-        // Channel count slider
-        const channelSlider = document.getElementById('input_channel_count');
-        const channelDisplay = document.getElementById('channel_count_display');
-        if (channelSlider && channelDisplay) {
-            channelSlider.addEventListener('input', () => {
-                channelDisplay.value = channelSlider.value;
-            });
-        }
+        syncSliderAndNumber('input_avb_bw', 'input_avb_bw_number');
+        syncSliderAndNumber('input_channel_count', 'input_channel_count_number');
     }
 
     /**
