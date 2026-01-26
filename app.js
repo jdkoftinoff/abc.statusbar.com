@@ -487,11 +487,12 @@
     /**
      * Generate plot data by iterating channels_per_stream until invalid
      * @param {Object} baseInputs - Current input values
-     * @returns {Object} {labels: number[], data: number[], currentIndex: number, maxChannels: number}
+     * @returns {Object} {labels: number[], totalChannels: number[], streamCounts: number[], currentIndex: number}
      */
     function generatePlotData(baseInputs) {
         const labels = [];
-        const data = [];
+        const totalChannels = [];
+        const streamCounts = [];
         const currentChannelCount = baseInputs.channel_count;
         let currentIndex = -1;
         const maxChannelsToTest = 512;  // Upper bound to prevent infinite loop
@@ -509,14 +510,15 @@
             }
 
             labels.push(channels);
-            data.push(outputs.total_channels_per_net_link);
+            totalChannels.push(outputs.total_channels_per_net_link);
+            streamCounts.push(outputs.max_stream_count_per_net_link);
 
             if (channels === currentChannelCount) {
                 currentIndex = labels.length - 1;
             }
         }
 
-        return { labels, data, currentIndex };
+        return { labels, totalChannels, streamCounts, currentIndex };
     }
 
     /**
@@ -560,8 +562,8 @@
         const colors = getThemeColors();
 
         // Find optimal point (maximum total channels)
-        const maxChannels = Math.max(...plotData.data);
-        const optimalIndex = plotData.data.indexOf(maxChannels);
+        const maxChannels = Math.max(...plotData.totalChannels);
+        const optimalIndex = plotData.totalChannels.indexOf(maxChannels);
 
         // Create point background colors (highlight current selection and optimal)
         const pointBackgroundColors = plotData.labels.map((label, index) => {
@@ -581,13 +583,16 @@
             return 0;
         });
 
+        // Stream count color (orange/amber)
+        const streamColor = '#e67e22';
+
         const chartConfig = {
             type: 'line',
             data: {
                 labels: plotData.labels,
                 datasets: [{
-                    label: 'Total Channels Per Link',
-                    data: plotData.data,
+                    label: 'Total Channels',
+                    data: plotData.totalChannels,
                     borderColor: colors.primary,
                     backgroundColor: colors.primary + '20',
                     borderWidth: 2,
@@ -596,7 +601,20 @@
                     pointBackgroundColor: pointBackgroundColors,
                     pointBorderColor: pointBackgroundColors,
                     pointRadius: pointRadii,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Streams',
+                    data: plotData.streamCounts,
+                    borderColor: streamColor,
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    yAxisID: 'y1'
                 }]
             },
             options: {
@@ -608,26 +626,31 @@
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: colors.text,
+                            usePointStyle: true
+                        }
                     },
                     tooltip: {
                         callbacks: {
                             title: (items) => `${items[0].label} channels/stream`,
                             label: (item) => {
-                                const channelsPerStream = parseInt(item.label, 10);
-                                const totalChannels = item.raw;
-                                const streams = Math.floor(totalChannels / channelsPerStream);
-                                const lines = [
-                                    `Total: ${totalChannels} channels`,
-                                    `Streams: ${streams}`
-                                ];
-                                if (item.dataIndex === optimalIndex) {
-                                    lines[0] += ' (optimal)';
+                                if (item.datasetIndex === 0) {
+                                    // Total channels dataset
+                                    let label = `Total: ${item.raw} channels`;
+                                    if (item.dataIndex === optimalIndex) {
+                                        label += ' (optimal)';
+                                    }
+                                    if (item.dataIndex === plotData.currentIndex) {
+                                        label += ' (current)';
+                                    }
+                                    return label;
+                                } else {
+                                    // Streams dataset
+                                    return `Streams: ${item.raw}`;
                                 }
-                                if (item.dataIndex === plotData.currentIndex) {
-                                    lines[0] += ' (current)';
-                                }
-                                return lines;
                             }
                         }
                     }
@@ -647,16 +670,34 @@
                         }
                     },
                     y: {
+                        type: 'linear',
+                        position: 'left',
                         title: {
                             display: true,
-                            text: 'Total Channels Per Link',
-                            color: colors.text
+                            text: 'Total Channels',
+                            color: colors.primary
                         },
                         ticks: {
-                            color: colors.muted
+                            color: colors.primary
                         },
                         grid: {
                             color: colors.grid
+                        },
+                        beginAtZero: true
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Streams',
+                            color: '#e67e22'
+                        },
+                        ticks: {
+                            color: '#e67e22'
+                        },
+                        grid: {
+                            drawOnChartArea: false
                         },
                         beginAtZero: true
                     }
