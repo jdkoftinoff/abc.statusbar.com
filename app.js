@@ -825,6 +825,24 @@
     }
 
     /**
+     * Show the update notification banner
+     * @param {ServiceWorker} worker - The waiting service worker
+     */
+    function showUpdateBanner(worker) {
+        const banner = document.getElementById('update-banner');
+        const button = document.getElementById('update-button');
+
+        if (banner && button) {
+            banner.hidden = false;
+
+            button.addEventListener('click', () => {
+                // Tell the waiting worker to skip waiting and become active
+                worker.postMessage({ type: 'SKIP_WAITING' });
+            }, { once: true });
+        }
+    }
+
+    /**
      * Initialize the application
      */
     function init() {
@@ -837,15 +855,47 @@
         // Set up live calculation
         initLiveCalculation();
 
-        // Register service worker for offline support
+        // Register service worker for offline support with update handling
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
                 .then(registration => {
                     console.log('Service Worker registered:', registration.scope);
+
+                    // Check for updates periodically (every 60 seconds)
+                    setInterval(() => {
+                        registration.update();
+                    }, 60000);
+
+                    // Handle updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version is installed and waiting
+                                    showUpdateBanner(newWorker);
+                                }
+                            });
+                        }
+                    });
+
+                    // If there's already a waiting worker, show the banner
+                    if (registration.waiting) {
+                        showUpdateBanner(registration.waiting);
+                    }
                 })
                 .catch(error => {
                     console.log('Service Worker registration failed:', error);
                 });
+
+            // Reload when the new service worker takes control
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
         }
     }
 

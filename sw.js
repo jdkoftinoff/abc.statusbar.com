@@ -3,7 +3,7 @@
  * Provides offline support via Cache API
  */
 
-const CACHE_NAME = 'avb-calc-v2026-5';
+const CACHE_NAME = 'avb-calc-v2026-6';
 
 // Assets to cache for offline use
 const ASSETS_TO_CACHE = [
@@ -61,8 +61,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Create a URL without query string for cache matching
+    // This allows versioned URLs like app.js?v=2026.6 to match cached app.js
+    const requestUrl = new URL(event.request.url);
+    const cacheUrl = requestUrl.origin + requestUrl.pathname;
+
     event.respondWith(
-        caches.match(event.request)
+        caches.match(cacheUrl)
             .then((cachedResponse) => {
                 if (cachedResponse) {
                     // Return cached response
@@ -80,10 +85,10 @@ self.addEventListener('fetch', (event) => {
                         // Clone the response (can only be consumed once)
                         const responseToCache = networkResponse.clone();
 
-                        // Add to cache for future requests
+                        // Add to cache using URL without query string
                         caches.open(CACHE_NAME)
                             .then((cache) => {
-                                cache.put(event.request, responseToCache);
+                                cache.put(cacheUrl, responseToCache);
                             });
 
                         return networkResponse;
@@ -101,4 +106,11 @@ self.addEventListener('fetch', (event) => {
                     });
             })
     );
+});
+
+// Message event - handle skip waiting request from page
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

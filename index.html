@@ -9,12 +9,18 @@
     <meta name="description" content="AVB Bandwidth Calculator - Calculate audio-video bridging network bandwidth requirements">
     <title>AVB Bandwidth Calculator</title>
     <link rel="stylesheet" href="css/pico.min.css">
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/app.css?v=2026.6">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="JDKS-fav_48x48.ico">
     <link rel="apple-touch-icon" href="jdks.png">
 </head>
 <body>
+    <!-- Update notification banner (hidden by default) -->
+    <div id="update-banner" class="update-banner" hidden>
+        <span>A new version is available!</span>
+        <button type="button" id="update-button">Reload</button>
+    </div>
+
     <header class="container">
         <div class="header-logo">
             <img src="jdks.png" alt="JDKS Logo">
@@ -344,7 +350,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="avbcalc.js"></script>
-    <script src="app.js"></script>
+    <script src="avbcalc.js?v=2026.6"></script>
+    <script src="app.js?v=2026.6"></script>
 </body>
 </html>
