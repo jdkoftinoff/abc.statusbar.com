@@ -329,3 +329,32 @@ fieldset label {
 fieldset input[type="checkbox"] {
     margin: 0;
 }
+
+/* Plot Panel */
+.plot-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 1rem auto;
+    aspect-ratio: 16 / 9;
+}
+
+.plot-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plot-legend {
+    text-align: center;
+    color: var(--pico-muted-color);
+    font-size: 0.9rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Mobile adjustments for plot */
+@media (max-width: 576px) {
+    .plot-container {
+        aspect-ratio: 4 / 3;
+    }
+}

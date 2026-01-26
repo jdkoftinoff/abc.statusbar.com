@@ -9,6 +9,9 @@
 (function() {
     'use strict';
 
+    // Chart.js instance reference
+    let channelPlotChart = null;
+
     // Input parameter names (must match avbcalc.js expectations)
     const INPUT_ITEMS = [
         'network_speed_in_bps', 'avb_bw', 'stream_format', 'sample_rate',
@@ -60,6 +63,13 @@
             if (activeTab) {
                 activeTab.classList.add('active');
                 activeTab.setAttribute('aria-selected', 'true');
+            }
+
+            // Update plot when switching to plot panel
+            if (targetId === 'plot') {
+                requestAnimationFrame(() => {
+                    updatePlot();
+                });
             }
         }
 
@@ -475,6 +485,238 @@
     }
 
     /**
+     * Generate plot data by iterating channels_per_stream until invalid
+     * @param {Object} baseInputs - Current input values
+     * @returns {Object} {labels: number[], data: number[], currentIndex: number, maxChannels: number}
+     */
+    function generatePlotData(baseInputs) {
+        const labels = [];
+        const data = [];
+        const currentChannelCount = baseInputs.channel_count;
+        let currentIndex = -1;
+        const maxChannelsToTest = 512;  // Upper bound to prevent infinite loop
+
+        for (let channels = 1; channels <= maxChannelsToTest; channels++) {
+            // Create modified inputs with this channel count
+            const inputs = { ...baseInputs, channel_count: channels };
+
+            // Calculate for this configuration
+            const outputs = calculate_avb(inputs);
+
+            // Stop when we hit an invalid configuration
+            if (outputs.status !== 'success') {
+                break;
+            }
+
+            labels.push(channels);
+            data.push(outputs.total_channels_per_net_link);
+
+            if (channels === currentChannelCount) {
+                currentIndex = labels.length - 1;
+            }
+        }
+
+        return { labels, data, currentIndex };
+    }
+
+    /**
+     * Get theme-aware colors from CSS custom properties
+     */
+    function getThemeColors() {
+        const style = getComputedStyle(document.documentElement);
+        return {
+            text: style.getPropertyValue('--pico-color').trim() || '#333',
+            primary: style.getPropertyValue('--pico-primary').trim() || '#1095c1',
+            muted: style.getPropertyValue('--pico-muted-color').trim() || '#666',
+            grid: style.getPropertyValue('--pico-muted-border-color').trim() || '#ddd',
+            background: style.getPropertyValue('--pico-card-background-color').trim() || '#fff'
+        };
+    }
+
+    /**
+     * Check if the Plot panel is currently active
+     */
+    function isPlotPanelActive() {
+        const plotPanel = document.getElementById('plot');
+        return plotPanel && plotPanel.classList.contains('active');
+    }
+
+    /**
+     * Initialize or update the channel plot chart
+     */
+    function updatePlot() {
+        const canvas = document.getElementById('channelPlot');
+        if (!canvas) return;
+
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not loaded yet');
+            return;
+        }
+
+        // Get current inputs and generate plot data
+        const inputs = getInputValues();
+        const plotData = generatePlotData(inputs);
+        const colors = getThemeColors();
+
+        // Find optimal point (maximum total channels)
+        const maxChannels = Math.max(...plotData.data);
+        const optimalIndex = plotData.data.indexOf(maxChannels);
+
+        // Create point background colors (highlight current selection and optimal)
+        const pointBackgroundColors = plotData.labels.map((label, index) => {
+            if (index === plotData.currentIndex) {
+                return colors.primary;  // Current selection
+            }
+            if (index === optimalIndex && optimalIndex !== plotData.currentIndex) {
+                return '#28a745';  // Optimal (green)
+            }
+            return 'transparent';
+        });
+
+        const pointRadii = plotData.labels.map((label, index) => {
+            if (index === plotData.currentIndex || index === optimalIndex) {
+                return 6;
+            }
+            return 0;
+        });
+
+        const chartConfig = {
+            type: 'line',
+            data: {
+                labels: plotData.labels,
+                datasets: [{
+                    label: 'Total Channels Per Link',
+                    data: plotData.data,
+                    borderColor: colors.primary,
+                    backgroundColor: colors.primary + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1,
+                    pointBackgroundColor: pointBackgroundColors,
+                    pointBorderColor: pointBackgroundColors,
+                    pointRadius: pointRadii,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => `${items[0].label} channels/stream`,
+                            label: (item) => {
+                                let label = `Total: ${item.raw} channels`;
+                                if (item.dataIndex === optimalIndex) {
+                                    label += ' (optimal)';
+                                }
+                                if (item.dataIndex === plotData.currentIndex) {
+                                    label += ' (current)';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Channels Per Stream',
+                            color: colors.text
+                        },
+                        ticks: {
+                            color: colors.muted
+                        },
+                        grid: {
+                            color: colors.grid
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Total Channels Per Link',
+                            color: colors.text
+                        },
+                        ticks: {
+                            color: colors.muted
+                        },
+                        grid: {
+                            color: colors.grid
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        // Update existing chart or create new one
+        if (channelPlotChart) {
+            channelPlotChart.data = chartConfig.data;
+            channelPlotChart.options = chartConfig.options;
+            channelPlotChart.update('none');  // Skip animation for live updates
+        } else {
+            channelPlotChart = new Chart(canvas, chartConfig);
+        }
+
+        // Update plot description with current settings
+        const maxValidChannels = plotData.labels.length > 0 ? plotData.labels[plotData.labels.length - 1] : 0;
+        updatePlotDescription(inputs, maxValidChannels);
+    }
+
+    /**
+     * Update the plot description with specific settings
+     */
+    function updatePlotDescription(inputs, maxValidChannels) {
+        const descElement = document.getElementById('plot-description');
+        if (!descElement) return;
+
+        // Format network speed
+        const speed = inputs.network_speed_in_bps;
+        let speedStr;
+        if (speed >= 1e9) {
+            speedStr = (speed / 1e9) + ' Gbps';
+        } else if (speed >= 1e6) {
+            speedStr = (speed / 1e6) + ' Mbps';
+        } else {
+            speedStr = (speed / 1e3) + ' kbps';
+        }
+
+        // Format stream format name
+        const formatNames = {
+            'AM824nb': 'AM824 non-blocking',
+            'AM824nb-async': 'AM824 non-blocking async',
+            'AM824b': 'AM824 blocking',
+            'AAF': 'AAF'
+        };
+        const formatStr = formatNames[inputs.stream_format] || inputs.stream_format;
+
+        // Format sample rate
+        const sampleRateStr = (inputs.sample_rate / 1000) + ' kHz';
+
+        // Build description
+        let description = `This chart shows the total audio channels achievable on a ${speedStr} link ` +
+            `with ${inputs.avb_bw}% AVB bandwidth allocation, using ${formatStr} format ` +
+            `at ${sampleRateStr} sample rate with ${inputs.bits_per_sample}-bit samples`;
+
+        if (inputs.aes_siv) {
+            description += ' and AES-SIV encryption enabled';
+        }
+
+        description += `. Valid configurations allow 1 to ${maxValidChannels} channels per stream. The optimal value maximizes total channels.`;
+
+        descElement.textContent = description;
+    }
+
+    /**
      * Display output values in the form
      * @param {Object} outputs - Results from calculate_avb()
      */
@@ -528,6 +770,11 @@
 
         // Display outputs
         setOutputValues(outputs);
+
+        // Update plot if visible
+        if (isPlotPanelActive()) {
+            updatePlot();
+        }
     }
 
     /**

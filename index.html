@@ -23,6 +23,7 @@
             <ul>
                 <li><a href="#calculator" class="tab" data-panel="calculator">Calculator</a></li>
                 <li><a href="#details" class="tab" data-panel="details">Details</a></li>
+                <li><a href="#plot" class="tab" data-panel="plot">Plot</a></li>
                 <li><a href="#info" class="tab" data-panel="info">Info</a></li>
             </ul>
         </nav>
@@ -215,6 +216,17 @@
             </details>
         </article>
 
+        <!-- Plot Panel -->
+        <article id="plot" role="tabpanel" class="panel">
+            <header>Total Channels vs Channels Per Stream</header>
+            <div class="plot-container">
+                <canvas id="channelPlot"></canvas>
+            </div>
+            <div class="plot-legend">
+                <p id="plot-description">This chart shows the total audio channels achievable on the network link as you vary the number of channels per stream from 1 to 64. The optimal value maximizes total channels.</p>
+            </div>
+        </article>
+
         <!-- Info Panel -->
         <article id="info" role="tabpanel" class="panel">
             <header>Information</header>
@@ -328,6 +340,7 @@
         <small>Version 2026 | <a href="http://avb.statusbar.com/">avb.statusbar.com</a></small>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="avbcalc.js"></script>
     <script src="app.js"></script>
 </body>
