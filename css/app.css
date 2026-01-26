@@ -3,6 +3,31 @@
  * Overrides and additions for Pico CSS
  */
 
+/* Header Logo */
+.header-logo {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.header-logo img {
+    max-width: 100px;
+    height: auto;
+    opacity: 0.12;
+}
+
+header.container {
+    position: relative;
+}
+
+header.container nav {
+    position: relative;
+    z-index: 1;
+}
+
 /* Tab Navigation */
 nav ul:last-child {
     gap: 0.5rem;

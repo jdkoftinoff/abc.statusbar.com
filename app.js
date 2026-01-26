@@ -614,14 +614,20 @@
                         callbacks: {
                             title: (items) => `${items[0].label} channels/stream`,
                             label: (item) => {
-                                let label = `Total: ${item.raw} channels`;
+                                const channelsPerStream = parseInt(item.label, 10);
+                                const totalChannels = item.raw;
+                                const streams = Math.floor(totalChannels / channelsPerStream);
+                                const lines = [
+                                    `Total: ${totalChannels} channels`,
+                                    `Streams: ${streams}`
+                                ];
                                 if (item.dataIndex === optimalIndex) {
-                                    label += ' (optimal)';
+                                    lines[0] += ' (optimal)';
                                 }
                                 if (item.dataIndex === plotData.currentIndex) {
-                                    label += ' (current)';
+                                    lines[0] += ' (current)';
                                 }
-                                return label;
+                                return lines;
                             }
                         }
                     }
