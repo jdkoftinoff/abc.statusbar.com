@@ -1,0 +1,24 @@
+{
+    "name": "AVB Bandwidth Calculator",
+    "short_name": "AVB Calc",
+    "description": "Calculate audio-video bridging (AVB) network bandwidth requirements",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1095c1",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "jdks.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "JDKS-fav_48x48.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        }
+    ],
+    "categories": ["utilities", "productivity"]
+}

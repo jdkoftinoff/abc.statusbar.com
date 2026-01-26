@@ -1,48 +1,43 @@
 <!DOCTYPE html>
-<html manifest="cache1.manifest">
+<html lang="en" data-theme="light">
 <head>
-<title>AvbBwCalc 2015-04-04a</title>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" href="jdks.png">
-<link rel="shortcut icon" href="JDKS-fav_48x48.ico" />
-<link rel="stylesheet" href="css/avb.min.css" />
-<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
-<script src="js/jquery-1.11.3.min.js"></script>
-<script src="js/jquery.mobile-1.4.0.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="avbcalc.js"></script>
-<script type="text/javascript" charset="utf-8" src="middle.js"></script>
- <style type="text/css">
-</style>
-<script type="text/javascript" >
-</script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="description" content="AVB Bandwidth Calculator - Calculate audio-video bridging network bandwidth requirements">
+    <title>AVB Bandwidth Calculator</title>
+    <link rel="stylesheet" href="css/pico.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="JDKS-fav_48x48.ico">
+    <link rel="apple-touch-icon" href="jdks.png">
 </head>
 <body>
-<div data-role="page" id="page_inputs">
-    <div data-role="header">
-        <h1>Avb Bw Calc</h1>
-        <div data-role="navbar" data-position="fixed">
+    <header class="container">
+        <nav>
             <ul>
-                <li><a href="#" class="ui-btn-active ui-state-persist" data-icon="home">Inputs</a></li>
-                <li><a href="#page_answers" data-icon="star">Answers</a></li>
-                <li><a href="#page_details" data-icon="search">Detail</a></li>
-                <li><a href="#page_info" data-icon="search">Explanations</a></li>
+                <li><strong>AVB Bandwidth Calculator</strong></li>
             </ul>
-        </div>
-    </div>
+            <ul>
+                <li><a href="#inputs" class="tab" data-panel="inputs">Inputs</a></li>
+                <li><a href="#answers" class="tab" data-panel="answers">Answers</a></li>
+                <li><a href="#details" class="tab" data-panel="details">Details</a></li>
+                <li><a href="#info" class="tab" data-panel="info">Info</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <div data-role="header" data-role="content">
-        <div class="content-primary">
-        <form>
-            <div data-role="fieldcontain">
+    <main class="container">
+        <!-- Inputs Panel -->
+        <article id="inputs" role="tabpanel" class="panel">
+            <form id="inputForm">
                 <label for="input_network_speed_in_bps">Network Speed</label>
-                <select id="input_network_speed_in_bps">
+                <select id="input_network_speed_in_bps" name="network_speed_in_bps">
                     <option value="10e6">10 Mbps</option>
                     <option value="100e6">100 Mbps</option>
-                    <option value="1e9" selected="">1 Gbps</option>
+                    <option value="1e9" selected>1 Gbps</option>
                     <option value="2.5e9">2.5 Gbps</option>
                     <option value="5.0e9">5 Gbps</option>
                     <option value="10e9">10 Gbps</option>
@@ -50,44 +45,41 @@
                     <option value="40e9">40 Gbps</option>
                     <option value="100e9">100 Gbps</option>
                 </select>
-            </div>
-            <div data-role="fieldcontain" >
-                <label for="input_avb_bw">AVB BW Allocation (%)</label>
-                <input type="range" name="input_avb_bw" id="input_avb_bw" value="75" min="5" max="95"  />
-            </div>
-            <div data-role="fieldcontain">
+
+                <label for="input_avb_bw">
+                    AVB BW Allocation: <output id="avb_bw_display">75</output>%
+                </label>
+                <input type="range" id="input_avb_bw" name="avb_bw" min="5" max="95" value="75">
+
                 <label for="input_stream_format">Stream Format</label>
-                <select id="input_stream_format">
+                <select id="input_stream_format" name="stream_format">
                     <option value="AM824nb">AM824 (non blocking)</option>
-                    <option value="AM824nb-async" selected="">AM824 (non blocking, Async Packetization)</option>
+                    <option value="AM824nb-async" selected>AM824 (non blocking, Async Packetization)</option>
                     <option value="AM824b">AM824 (blocking)</option>
                     <option value="AAF">AAF</option>
                 </select>
-            </div>
-            <div data-role="fieldcontain">
+
                 <label for="input_sample_rate">Sample Rate</label>
-                <select id="input_sample_rate">
+                <select id="input_sample_rate" name="sample_rate">
                     <option value="32000">32.0 kHz</option>
                     <option value="44100">44.1 kHz</option>
-                    <option value="48000" selected="">48 kHz</option>
+                    <option value="48000" selected>48 kHz</option>
                     <option value="88200">88.2 kHz</option>
                     <option value="96000">96 kHz</option>
                     <option value="176400">176.4 kHz</option>
                     <option value="192000">192 kHz</option>
                 </select>
-            </div>
-            <div data-role="fieldcontain">
+
                 <label for="input_bits_per_sample">Bits/Sample</label>
-                <select id="input_bits_per_sample">
+                <select id="input_bits_per_sample" name="bits_per_sample">
                     <option value="16">16</option>
-                    <option value="24" selected="">24</option>
+                    <option value="24" selected>24</option>
                     <option value="32">32</option>
                 </select>
-            </div>
-            <div data-role="fieldcontain">
+
                 <label for="input_samples_per_frame">AAF Samples/Frame</label>
-                <select id="input_samples_per_frame">
-                    <option value="default" selected="">Default</option>
+                <select id="input_samples_per_frame" name="samples_per_frame">
+                    <option value="default" selected>Default</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -125,183 +117,133 @@
                     <option value="1000">1000</option>
                     <option value="1024">1024</option>
                 </select>
-            </div>
-            <div data-role="fieldcontain">
-                <label for="input_channel_count">Channels Per Stream</label>
-                <input type="range" name="input_channel_count" id="input_channel_count" value="1" min="1" max="738"  />
-            </div>
-            <div data-role="fieldcontain">
-                <input type="checkbox" name="input_aes_siv_checkbox" id="input_aes_siv" value="0" >
-                <label for="input_aes_siv">AES-SIV Encryption</label>
-            </div>
-            <div data-role="fieldcontain">
+
+                <label for="input_channel_count">
+                    Channels Per Stream: <output id="channel_count_display">1</output>
+                </label>
+                <input type="range" id="input_channel_count" name="channel_count" min="1" max="738" value="1">
+
+                <fieldset>
+                    <label>
+                        <input type="checkbox" id="input_aes_siv" name="aes_siv" value="1">
+                        AES-SIV Encryption
+                    </label>
+                </fieldset>
+
                 <label for="input_observation_interval_freq">Observation Interval</label>
-                <select id="input_observation_interval_freq">
-                    <option value="8000" selected="">Default</option>
+                <select id="input_observation_interval_freq" name="observation_interval_freq">
+                    <option value="8000" selected>Default (125 us)</option>
                     <option value="250">4 ms</option>
                     <option value="500">2 ms</option>
                     <option value="1000">1 ms</option>
-                    <option value="1500">666.6 µs</option>
-                    <option value="2000">500 µs</option>
-                    <option value="3000">333.3 µs</option>
-                    <option value="4000">250 µs</option>
-                    <option value="5000">200 µs</option>
-                    <option value="6000">166.6 µs</option>
-                    <option value="8000">125 µs</option>
+                    <option value="1500">666.6 us</option>
+                    <option value="2000">500 us</option>
+                    <option value="3000">333.3 us</option>
+                    <option value="4000">250 us</option>
+                    <option value="5000">200 us</option>
+                    <option value="6000">166.6 us</option>
+                    <option value="8000">125 us</option>
                 </select>
-            </div>
-            <div><hr></div>
-        </form>
-        <center><button id="calculate" onclick="process_abc_form(this)">Calculate</button></center>
-    </div>
-    </div>
-    <div data-role="footer" style="text-align:center;">
-        See <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
-    </div>
-</div>
 
-<div data-role="page" id="page_answers">
-    <div data-role="header">
-        <h1>Avb Bw Calc</h1>
-        <div data-role="navbar">
-            <ul>
-                <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
-                <li><a href="#" class="ui-btn-active ui-state-persist" data-icon="star">Answers</a></li>
-                <li><a href="#page_details" data-icon="search">Detail</a></li>
-                <li><a href="#page_info" data-icon="search">Explanations</a></li>
-            </ul>
-        </div>
-    </div>
+                <button type="button" id="calculate">Calculate</button>
+            </form>
+        </article>
 
-    <div data-role="content">
-        <form id="results" class="container scrollable" style="width:100%"  >
-            <div data-role="fieldcontain">
-                <label for="output_status">Status</label>
-                <input type="text" id="output_status" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_total_channels_per_net_link">Total channels per network link</label>
-                <input type="text" id="output_total_channels_per_net_link" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_channels_per_stream">Total channels per stream</label>
-                <input type="text" id="output_channels_per_stream" readonly >
-            </div>
-            <div data-role="fieldcontain" >
-                <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-                <input type="text" id="output_max_stream_count_per_net_link" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
-                <input type="text" id="output_total_bw_used_in_bps" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
-                <input type="text" id="output_leftover_bw_in_bps" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_octets_per_frame">Largest Frame Payload Length</label>
-                <input type="text" id="output_ethernet_payload_length" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
-                <input type="text" id="output_octets_per_frame" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_micros_per_frame">Largest µs per frame</label>
-                <input type="text" id="output_micros_per_frame" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_bw_per_stream_in_bps">bps used per stream</label>
-                <input type="text" id="output_bw_per_stream_in_bps" readonly >
-            </div>
-            <div data-role="fieldcontain">
-                <label for="output_efficency">Efficiency in % (audio payload bps / nominal packet bps) </label>
-                <input type="text" id="output_efficiency" readonly >
-            </div>
-                    </div>
-    </div>
+        <!-- Answers Panel -->
+        <article id="answers" role="tabpanel" class="panel">
+            <header>Calculation Results</header>
 
-    <div data-role="footer" style="text-align:center;">
-        See <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
-    </div>
-</div>
+            <label for="output_status">Status</label>
+            <input type="text" id="output_status" readonly>
 
+            <label for="output_total_channels_per_net_link">Total channels per network link</label>
+            <input type="text" id="output_total_channels_per_net_link" readonly>
 
-<div data-role="page" id="page_details">
-    <div data-role="header">
-        <h1>Avb Bw Calc</h1>
-        <div data-role="navbar">
-            <ul>
-                <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
-                <li><a href="#page_answers" data-icon="star">Answers</a></li>
-                <li><a href="#" class="ui-btn-active ui-state-persist" data-icon="search">Detail</a></li>
-                <li><a href="#page_info" data-icon="search">Explanations</a></li>
-            </ul>
-        </div>
-    </div>
-    <div data-role="content">
-        <div class="container scrollable">
-            <pre id="output_detail" style="width:100%;height:100%;"></pre>
-        </div>
-    </div>
-    <div data-role="footer" style="text-align:center;">
-        See <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
-    </div>
-</div>
+            <label for="output_channels_per_stream">Total channels per stream</label>
+            <input type="text" id="output_channels_per_stream" readonly>
 
+            <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
+            <input type="text" id="output_max_stream_count_per_net_link" readonly>
 
+            <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
+            <input type="text" id="output_total_bw_used_in_bps" readonly>
 
-<div data-role="page" id="page_info">
-    <div data-role="header">
-        <h1>Avb Bw Calc</h1>
-        <div data-role="navbar">
-            <ul>
-                <li><a href="#page_inputs" data-icon="home">Inputs</a></li>
-                <li><a href="#page_answers" data-icon="star">Answers</a></li>
-                <li><a href="#page_details" data-icon="search">Detail</a></li>
-                <li><a href="#page_info" class="ui-btn-active ui-state-persist" data-icon="search">Explanations</a></li>
-            </ul>
-        </div>
-    </div>
-    <div data-role="content">
-        <div class="container scrollable" style="width:100%"  >
-            <h1>Information</h1>
-            <p>This AVB Bandwidth Calculator is provided by Jeff Koftinoff <a href="mailto:jeff.koftinoff@gmail.com">&lt;jeff.koftinoff@gmail.com&gt;</a></p>
-            <p>See <a href="http://avb.statusbar.com/">avb.statusbar.com</a> for more information</p>
-            <h2 id="info_avb_bw">AVB BW Allocation</h2>
+            <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
+            <input type="text" id="output_leftover_bw_in_bps" readonly>
+
+            <label for="output_ethernet_payload_length">Largest Frame Payload Length</label>
+            <input type="text" id="output_ethernet_payload_length" readonly>
+
+            <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
+            <input type="text" id="output_octets_per_frame" readonly>
+
+            <label for="output_micros_per_frame">Largest us per frame</label>
+            <input type="text" id="output_micros_per_frame" readonly>
+
+            <label for="output_bw_per_stream_in_bps">bps used per stream</label>
+            <input type="text" id="output_bw_per_stream_in_bps" readonly>
+
+            <label for="output_efficiency">Efficiency (audio payload bps / nominal packet bps)</label>
+            <input type="text" id="output_efficiency" readonly>
+        </article>
+
+        <!-- Details Panel -->
+        <article id="details" role="tabpanel" class="panel">
+            <header>Detailed Output (JSON)</header>
+            <pre id="output_detail"><code></code></pre>
+        </article>
+
+        <!-- Info Panel -->
+        <article id="info" role="tabpanel" class="panel">
+            <header>Information</header>
+
+            <p>This AVB Bandwidth Calculator is provided by Jeff Koftinoff
+               <a href="mailto:jeff.koftinoff@gmail.com">&lt;jeff.koftinoff@gmail.com&gt;</a></p>
+            <p>See <a href="http://avb.statusbar.com/">avb.statusbar.com</a> for more information.</p>
+
+            <h3>AVB BW Allocation</h3>
             <p>The bandwidth allocation for AVB (AVB BW) defaults to 75%. At this setting the most bandwidth that AVB Time Sensitive Streams will take is 75% of the available bandwidth of each network link.</p>
-            <h2 id="info_stream_format">Stream Format</h2>
-<p>There are two audio stream formats used by AVB: AM824 and AAF.</p>
-<p>AM824 supports the transport of 24 bit linear audio, iec60958 encoded audio (SPDIF and AES3), SMPTE Time Code, and MIDI.</p>
-<p>AM824 has three options for the talker: "non-blocking (sync)", "non-blocking (aync)", and "blocking."</p>
-<p>Regardless of the talker's AM824 packetization, an AVB listener is required to receive frames using any of the three options: AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
-            <h3>AM824 (non blocking, synchronous)</h3>
-            <p>The typical AVB audio device transmits using “AM824 non-blocking, synchronous” mode.  Non-Blocking means it sends one frame every observation period (125µs). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).  </p>
-            <h3>AM824 (non blocking, async packetization)</h3>
-            <p>“AM824 non-blocking, asynchronous” mode means that the transmitter may send an occasional ethernet frame with one extra or one less sample due to the packetizer being asynchronous to the transmitter's observation interval.  Devices that handle more than one clock domain but have one packetizer typically use this format. Because it can send the occasional ethernet frame with 7 samples @ 48 kHz or 13 samples @ 96 kHz, it needs to reserve enough bandwidth to allow it to do so. The Apple Mac transmits AM824 non-blocking, asynchronous mode.</p>
-            <h3>AM824 (blocking)</h3>
-            <p>“AM824 blocking mode” is a mode that some firewire devices use, as it is easier to packetize and depacketize.  At 48 kHz, each ethernet frame always contains 8 samples. at 96 kHz, each ethernet frame always contains 16 samples. The avtp_timestamp is always for the first sample in the ethernet frame and there is always an avtp_timestamp. Because it is sending this frame every 125µs, there are some times when it doesn’t need to send any ethernet frame at all. But when it does, it is always the same size packet.  The drawback for this format is that you have to reserve bandwidth for the 8 sample frame @ 48 kHz or 16 sample frame at 96 kHz.</p>
-            <h3>AAF</h3>
-            <p>“AVTP Audio Format” (AAF) is a new packetization format that is defined in IEEE p1722a.  It has lower overhead than AM824, requires each ethernet frame in a stream to be the same size and format, and allows 16 bits, 24 bits at 32 bits per sample, as well as a choice on the number of samples per ethernet frame. Every ethernet frame is always the same size and format.</p>
-            <h2 id="info_sample_rate">Sample Rate</h2>
-            <p>All AVB stream formats can support 32 kHz, 44.1 kHz, 48 kHz, 88.2 kHz, 96 kHz, 176.4 kHz, and 192 kHz.  AAF can also support NTSC pulled rates (* 1.001 or * 1/1.001).</p>
-            <h2 id="info_bits_per_sample">Bits/Sample</h2>
-            <p>AM824 formats only support 24 bits per sample.  AAF formats allow packed 16 bits, 24 bits, and 32 bits per sample. For Floating point stream formats, choose 32 bits per sample.</p>
-            <h2 id="info_aaf_samples_per_frame">AAF Samples/Frame</h2>
-            <p>AM824 packetization allows one ethernet frame per stream per observation interval (125µs).  AAF format supports multiple ethernet frames per observation interval, allowing for more channels per stream.</p>
-            <h2 id="info_channel_count">Channel Count</h2>
-            <p>The channel count.</p>
-            <h2 id="info_aes_siv_encryption">AES-SIV Encryption</h2>
-            <p>IEEE p1722a supports <a href="http://tools.ietf.org/html/rfc5297">AES-SIV</a> encrypted AVB streams.  When the ethernet frame is encrypted this adds some overhead to the ethernet frame.</p>
-        </div>
-    </div>
-    <div data-role="footer" style="text-align:center;">
-       Version 2025-05-11,  See <a href="http://avb.statusbar.com/">avb.statusbar.com</a>
-    </div>
 
-</div>
+            <h3>Stream Format</h3>
+            <p>There are two audio stream formats used by AVB: AM824 and AAF.</p>
+            <p>AM824 supports the transport of 24 bit linear audio, iec60958 encoded audio (SPDIF and AES3), SMPTE Time Code, and MIDI.</p>
+            <p>AM824 has three options for the talker: "non-blocking (sync)", "non-blocking (async)", and "blocking."</p>
+            <p>Regardless of the talker's AM824 packetization, an AVB listener is required to receive frames using any of the three options: AM824 non-blocking synchronous, AM824 non-blocking asynchronous, and AM824 blocking mode.</p>
 
+            <h4>AM824 (non blocking, synchronous)</h4>
+            <p>The typical AVB audio device transmits using "AM824 non-blocking, synchronous" mode. Non-Blocking means it sends one frame every observation period (125us). Synchronous means it always sends the same number of samples per ethernet frame (6 @ 48 kHz, 12 @ 96 kHz).</p>
+
+            <h4>AM824 (non blocking, async packetization)</h4>
+            <p>"AM824 non-blocking, asynchronous" mode means that the transmitter may send an occasional ethernet frame with one extra or one less sample due to the packetizer being asynchronous to the transmitter's observation interval. Devices that handle more than one clock domain but have one packetizer typically use this format. Because it can send the occasional ethernet frame with 7 samples @ 48 kHz or 13 samples @ 96 kHz, it needs to reserve enough bandwidth to allow it to do so. The Apple Mac transmits AM824 non-blocking, asynchronous mode.</p>
+
+            <h4>AM824 (blocking)</h4>
+            <p>"AM824 blocking mode" is a mode that some firewire devices use, as it is easier to packetize and depacketize. At 48 kHz, each ethernet frame always contains 8 samples. At 96 kHz, each ethernet frame always contains 16 samples. The avtp_timestamp is always for the first sample in the ethernet frame and there is always an avtp_timestamp. Because it is sending this frame every 125us, there are some times when it doesn't need to send any ethernet frame at all. But when it does, it is always the same size packet. The drawback for this format is that you have to reserve bandwidth for the 8 sample frame @ 48 kHz or 16 sample frame at 96 kHz.</p>
+
+            <h4>AAF</h4>
+            <p>"AVTP Audio Format" (AAF) is a newer packetization format defined in IEEE 1722. It has lower overhead than AM824, requires each ethernet frame in a stream to be the same size and format, and allows 16 bits, 24 bits, or 32 bits per sample, as well as a choice on the number of samples per ethernet frame. Every ethernet frame is always the same size and format.</p>
+
+            <h3>Sample Rate</h3>
+            <p>All AVB stream formats can support 32 kHz, 44.1 kHz, 48 kHz, 88.2 kHz, 96 kHz, 176.4 kHz, and 192 kHz. AAF can also support NTSC pulled rates (* 1.001 or * 1/1.001).</p>
+
+            <h3>Bits/Sample</h3>
+            <p>AM824 formats only support 24 bits per sample. AAF formats allow packed 16 bits, 24 bits, and 32 bits per sample. For floating point stream formats, choose 32 bits per sample.</p>
+
+            <h3>AAF Samples/Frame</h3>
+            <p>AM824 packetization allows one ethernet frame per stream per observation interval (125us). AAF format supports multiple ethernet frames per observation interval, allowing for more channels per stream.</p>
+
+            <h3>Channel Count</h3>
+            <p>The number of audio channels per stream.</p>
+
+            <h3>AES-SIV Encryption</h3>
+            <p>IEEE 1722 supports <a href="http://tools.ietf.org/html/rfc5297">AES-SIV</a> encrypted AVB streams. When the ethernet frame is encrypted this adds some overhead to the ethernet frame.</p>
+        </article>
+    </main>
+
+    <footer class="container">
+        <small>Version 2026 | <a href="http://avb.statusbar.com/">avb.statusbar.com</a></small>
+    </footer>
+
+    <script src="avbcalc.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
-
