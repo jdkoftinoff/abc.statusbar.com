@@ -67,6 +67,19 @@ function process_abc_form(item) {
             val=widget.val();
         }
 
+        // Convert numeric values to numbers
+        if( key === "network_speed_in_bps" || key === "avb_bw" || key === "bits_per_sample" || 
+            key === "channel_count" || key === "aes_siv" || key === "samples_per_frame" || 
+            key === "observation_interval_freq" ) {
+            // Try to parse as number, but keep "default" as string
+            if( val !== "default" && val !== "Default" ) {
+                val = Number(val);
+            }
+        } else if( key === "sample_rate" ) {
+            // sample_rate should be numeric
+            val = Number(val);
+        }
+
         inputs[key] = val;
     }
 

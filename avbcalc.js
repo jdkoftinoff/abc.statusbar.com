@@ -154,10 +154,17 @@ function calculate_avb( inputs ) {
         r.frames_per_observation_interval = 1;
 
         // Class A is 8000 observation intervals per second
-        r.observation_intervals_per_second = inputs.observation_intervals_per_second
+        r.observation_intervals_per_second = inputs.observation_intervals_per_second;
 
         r.nominal_frames_per_second = inputs.sample_rate / r.nominal_samples_per_frame;
-        r.frames_per_second = r.frames_per_observation_interval * r.observation_intervals_per_second;
+        
+        // For async AM824, frames_per_second is based on sample rate
+        // For sync AM824, frames_per_second is based on observation intervals
+        if( inputs.stream_format == "AM824nb-async" ) {
+            r.frames_per_second = inputs.sample_rate / r.samples_per_frame;
+        } else {
+            r.frames_per_second = r.frames_per_observation_interval * r.observation_intervals_per_second;
+        }
         
     } else if ( inputs.stream_format == "AM824b" ) {
         r.status = "success";
@@ -204,8 +211,12 @@ function calculate_avb( inputs ) {
         r.samples_per_observation_interval = am824nb_sync_samples_per_frame_from_sample_rate[ inputs.sample_rate ];
 
         // samples per frame can be parameterized
-        if( inputs.samples_per_frame > 0 ) {
-            r.samples_per_frame = inputs.samples_per_frame;
+        // If "default" string or value <= 0, use the default for this sample rate
+        var samples_value = inputs.samples_per_frame;
+        if( typeof samples_value === 'string' && (samples_value === 'default' || samples_value === 'Default') ) {
+            r.samples_per_frame = r.samples_per_observation_interval;
+        } else if( Number(samples_value) > 0 ) {
+            r.samples_per_frame = Number(samples_value);
         } else {
             r.samples_per_frame = r.samples_per_observation_interval;
         }
@@ -288,6 +299,7 @@ function calculate_avb( inputs ) {
         r.ethernet_payload_length += r.aes_siv_overhead;
         r.nominal_ethernet_payload_length += r.nominal_aes_siv_overhead;
 
+        r.octets_per_frame += r.aes_siv_overhead;
         r.nominal_octets_per_frame += r.nominal_aes_siv_overhead;
     }
 
