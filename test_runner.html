@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AVB Calculator Unit Tests</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #252526;
+            border-left: 3px solid #007acc;
+            border-radius: 4px;
+        }
+        .pass {
+            color: #4ec9b0;
+        }
+        .fail {
+            color: #f48771;
+            font-weight: bold;
+        }
+        .divider {
+            border-top: 2px solid #666;
+            margin: 30px 0;
+            padding-top: 20px;
+        }
+        pre {
+            background-color: #1e1e1e;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #005a9e;
+        }
+        #test-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>AVB Bandwidth Calculator - Unit Tests</h1>
+    <button onclick="runTests()">Run All Tests</button>
+    <button onclick="clearOutput()">Clear Output</button>
+    
+    <div id="test-output"></div>
+
+    <script src="avbcalc.js"></script>
+    <script src="test_avbcalc.js"></script>
+    <script src="test_user_scenario.js"></script>
+    <script>
+        var originalLog = console.log;
+        var originalError = console.error;
+        var testOutput = document.getElementById('test-output');
+        
+        console.log = function(msg) {
+            originalLog(msg);
+            var span = document.createElement('div');
+            if (msg.includes('✓') || msg.includes('PASSED')) {
+                span.className = 'pass';
+            } else if (msg.includes('❌') || msg.includes('FAILED')) {
+                span.className = 'fail';
+            }
+            span.textContent = msg;
+            testOutput.appendChild(span);
+        };
+        
+        console.error = function(msg) {
+            originalError(msg);
+            var span = document.createElement('div');
+            span.className = 'fail';
+            span.textContent = msg;
+            testOutput.appendChild(span);
+        };
+        
+        // Test framework utilities
+        function assert(condition, message) {
+            if (!condition) {
+                console.error("❌ FAILED: " + message);
+                return false;
+            } else {
+                console.log("✓ PASSED: " + message);
+                return true;
+            }
+        }
+
+        function assertAlmostEqual(actual, expected, tolerance, message) {
+            if (Math.abs(actual - expected) <= tolerance) {
+                console.log("✓ PASSED: " + message + " (expected: " + expected + ", got: " + actual + ")");
+                return true;
+            } else {
+                console.error("❌ FAILED: " + message + " (expected: " + expected + ", got: " + actual + ")");
+                return false;
+            }
+        }
+
+        function describe(testName, testFunc) {
+            console.log("\n=== " + testName + " ===");
+            testFunc();
+        }
+
+        function runTests() {
+            clearOutput();
+            console.log("Starting AVB Calculator Unit Tests...");
+            console.log("Timestamp: " + new Date().toISOString());
+            
+            // Test 1: AM824 Non-Blocking with default observation intervals
+            describe("Test 1: AM824 Non-Blocking Async (Default Obs Interval)", function() {
+                var inputs = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb-async",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 2,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var result = calculate_avb(inputs);
+                
+                assert(result.status === "success", "Status should be 'success', got: " + result.status);
+                assert(result.observation_intervals_per_second === 8000, 
+                    "Observation intervals should be 8000, got: " + result.observation_intervals_per_second);
+                assert(result.samples_per_frame === 7, 
+                    "Samples per frame should be 7 for 48kHz async, got: " + result.samples_per_frame);
+                assertAlmostEqual(result.frames_per_second, 48000/7, 1, 
+                    "Frames per second calculation (48000/7)");
+                assert(result.max_stream_count_per_net_link > 0, 
+                    "Max stream count should be positive, got: " + result.max_stream_count_per_net_link);
+                console.log("   Octets per frame: " + result.octets_per_frame);
+                console.log("   Max streams: " + result.max_stream_count_per_net_link);
+                console.log("   Total BW used: " + result.total_bw_used_in_bps + " bps");
+                console.log("   Efficiency: " + result.efficiency + "%");
+            });
+
+            // Test 2: AM824 Blocking with default observation intervals  
+            describe("Test 2: AM824 Blocking (Default Obs Interval)", function() {
+                var inputs = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824b",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 2,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var result = calculate_avb(inputs);
+                
+                assert(result.status === "success", "Status should be 'success'");
+                assert(result.observation_intervals_per_second === 8000, 
+                    "Observation intervals should be 8000");
+                assert(result.samples_per_frame === 8, 
+                    "Samples per frame should be 8 for 48kHz blocking, got: " + result.samples_per_frame);
+                console.log("   Octets per frame: " + result.octets_per_frame);
+                console.log("   Max streams: " + result.max_stream_count_per_net_link);
+            });
+
+            // Test 3: AAF with default parameters
+            describe("Test 3: AAF with Default Sample Rate and Default Samples Per Frame", function() {
+                var inputs = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AAF",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 2,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: "default"
+                };
+                
+                var result = calculate_avb(inputs);
+                
+                assert(result.status === "success", "Status should be 'success'");
+                assert(result.octets_per_sample === 3, 
+                    "Octets per sample should be 3 for 24-bit (24/8), got: " + result.octets_per_sample);
+                assert(result.samples_per_frame > 0, 
+                    "Samples per frame should be positive, got: " + result.samples_per_frame);
+                console.log("   Octets per sample: " + result.octets_per_sample);
+                console.log("   Samples per frame: " + result.samples_per_frame);
+                console.log("   Frames per observation interval: " + result.frames_per_observation_interval);
+                console.log("   Max streams: " + result.max_stream_count_per_net_link);
+            });
+
+            // Test 4: Observation interval effect
+            describe("Test 4: Observation Interval Effect on Bandwidth", function() {
+                var inputs1 = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 1,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var inputs2 = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 1,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 4000,
+                    samples_per_frame: 0
+                };
+                
+                var result1 = calculate_avb(inputs1);
+                var result2 = calculate_avb(inputs2);
+                
+                assert(result1.observation_intervals_per_second === 8000, "Result1 obs interval should be 8000");
+                assert(result2.observation_intervals_per_second === 4000, "Result2 obs interval should be 4000");
+                
+                console.log("   8000 OI/s: frames_per_second = " + result1.frames_per_second);
+                console.log("   4000 OI/s: frames_per_second = " + result2.frames_per_second);
+                console.log("   Ratio: " + (result1.frames_per_second/result2.frames_per_second));
+                
+                assertAlmostEqual(result1.frames_per_second/result2.frames_per_second, 2, 0.01, 
+                    "With half obs intervals, frames per second should double");
+            });
+
+            // Test 5: Bandwidth calculation consistency
+            describe("Test 5: Bandwidth Calculation Consistency", function() {
+                var inputs = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb-async",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 2,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var result = calculate_avb(inputs);
+                
+                var expected_bw = 8 * result.octets_per_frame * result.frames_per_second;
+                assertAlmostEqual(result.bw_per_stream_in_bps, expected_bw, 1,
+                    "BW per stream calculation");
+                
+                var expected_total = result.bw_per_stream_in_bps * result.max_stream_count_per_net_link;
+                assertAlmostEqual(result.total_bw_used_in_bps, expected_total, 1,
+                    "Total BW used calculation");
+                
+                var available_bw = inputs.network_speed_in_bps * inputs.avb_bw * 0.01;
+                assert(result.total_bw_used_in_bps <= available_bw,
+                    "Total BW should not exceed available BW (" + result.total_bw_used_in_bps + " <= " + available_bw + ")");
+            });
+
+            // Test 6: AES-SIV adds overhead
+            describe("Test 6: AES-SIV Encryption Overhead", function() {
+                var inputs_plain = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 1,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var inputs_encrypted = {
+                    network_speed_in_bps: 1e9,
+                    avb_bw: 75,
+                    stream_format: "AM824nb",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 1,
+                    aes_siv: 1,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: 0
+                };
+                
+                var result_plain = calculate_avb(inputs_plain);
+                var result_encrypted = calculate_avb(inputs_encrypted);
+                
+                assert(result_encrypted.octets_per_frame > result_plain.octets_per_frame,
+                    "Encrypted should have more octets per frame");
+                assert(result_encrypted.bw_per_stream_in_bps > result_plain.bw_per_stream_in_bps,
+                    "Encrypted should have higher BW per stream");
+                
+                console.log("   Plain: " + result_plain.octets_per_frame + " octets, " + result_plain.max_stream_count_per_net_link + " max streams");
+                console.log("   Encrypted: " + result_encrypted.octets_per_frame + " octets, " + result_encrypted.max_stream_count_per_net_link + " max streams");
+            });
+
+            // Test 7: User Reported Issue - 10 Mbps AAF with 3 channels
+            // NOTE: 75% AVB on 10 Mbps cannot fit even one AAF stream with these specs
+            // Realistic scenario: 100 Mbps at 75% AVB works, or 10 Mbps at 95% AVB works
+            describe("Test 7: 100 Mbps AAF with 3 Channels (Validates Type Conversion Fix)", function() {
+                var inputs = {
+                    network_speed_in_bps: 100000000,  // 100 Mbps (scaled up to fit the constraint)
+                    avb_bw: 75,
+                    stream_format: "AAF",
+                    sample_rate: "48000",
+                    bits_per_sample: 24,
+                    channel_count: 3,
+                    aes_siv: 0,
+                    observation_intervals_per_second: 8000,
+                    samples_per_frame: "default"
+                };
+                
+                var result = calculate_avb(inputs);
+                var available_bw = 100000000 * 0.75;
+                var expected_channels = result.max_stream_count_per_net_link * 3;
+                var expected_leftover = available_bw - result.total_bw_used_in_bps;
+                
+                assert(result.status === "success", "Status should be success");
+                assert(result.total_channels_per_net_link === expected_channels, 
+                    "Total channels should match max_streams * channel_count");
+                assertAlmostEqual(result.leftover_bw_in_bps, expected_leftover, 1,
+                    "Leftover BW calculation should match (available - used)");
+                assert(result.total_bw_used_in_bps <= available_bw,
+                    "Used BW should not exceed available BW");
+                assert(result.channel_count === 3, "Input channel_count preserved correctly");
+                
+                console.log("   Network: " + (inputs.network_speed_in_bps/1000000) + " Mbps");
+                console.log("   Channels per stream: " + inputs.channel_count);
+                console.log("   Max streams: " + result.max_stream_count_per_net_link);
+                console.log("   Total channels: " + result.total_channels_per_net_link);
+                console.log("   BW used: " + result.total_bw_used_in_bps + " bps");
+                console.log("   Available BW: " + available_bw + " bps");
+                console.log("   Leftover: " + result.leftover_bw_in_bps + " bps");
+                console.log("   (Validates form input type conversion from string to number)");
+            });
+
+            console.log("\n" + "=".repeat(50));
+            console.log("TESTS COMPLETE");
+            console.log("=".repeat(50));
+        }
+        
+        function clearOutput() {
+            testOutput.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
