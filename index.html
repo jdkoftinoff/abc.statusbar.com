@@ -21,8 +21,7 @@
                 <li><strong>AVB Bandwidth Calculator</strong></li>
             </ul>
             <ul>
-                <li><a href="#inputs" class="tab" data-panel="inputs">Inputs</a></li>
-                <li><a href="#answers" class="tab" data-panel="answers">Answers</a></li>
+                <li><a href="#calculator" class="tab" data-panel="calculator">Calculator</a></li>
                 <li><a href="#details" class="tab" data-panel="details">Details</a></li>
                 <li><a href="#info" class="tab" data-panel="info">Info</a></li>
             </ul>
@@ -30,169 +29,177 @@
     </header>
 
     <main class="container">
-        <!-- Inputs Panel -->
-        <article id="inputs" role="tabpanel" class="panel">
-            <form id="inputForm">
-                <label for="input_network_speed_in_bps">Network Speed</label>
-                <select id="input_network_speed_in_bps" name="network_speed_in_bps">
-                    <option value="10e6">10 Mbps</option>
-                    <option value="100e6">100 Mbps</option>
-                    <option value="1e9" selected>1 Gbps</option>
-                    <option value="2.5e9">2.5 Gbps</option>
-                    <option value="5.0e9">5 Gbps</option>
-                    <option value="10e9">10 Gbps</option>
-                    <option value="25e9">25 Gbps</option>
-                    <option value="40e9">40 Gbps</option>
-                    <option value="100e9">100 Gbps</option>
-                </select>
+        <!-- Calculator Panel (Inputs + Answers side-by-side) -->
+        <div id="calculator" role="tabpanel" class="panel">
+            <div class="calculator-grid">
+                <!-- Inputs Column -->
+                <article class="inputs-column">
+                    <header>Inputs</header>
+                    <form id="inputForm">
+                        <label for="input_network_speed_in_bps">Network Speed</label>
+                        <select id="input_network_speed_in_bps" name="network_speed_in_bps">
+                            <option value="10e6">10 Mbps</option>
+                            <option value="100e6">100 Mbps</option>
+                            <option value="1e9" selected>1 Gbps</option>
+                            <option value="2.5e9">2.5 Gbps</option>
+                            <option value="5.0e9">5 Gbps</option>
+                            <option value="10e9">10 Gbps</option>
+                            <option value="25e9">25 Gbps</option>
+                            <option value="40e9">40 Gbps</option>
+                            <option value="100e9">100 Gbps</option>
+                        </select>
 
-                <label for="input_avb_bw">AVB BW Allocation (%)</label>
-                <div class="slider-with-input">
-                    <input type="range" id="input_avb_bw" name="avb_bw" min="5" max="95" value="75">
-                    <input type="number" id="input_avb_bw_number" min="5" max="95" value="75" aria-label="AVB BW Allocation percentage">
-                </div>
+                        <label for="input_avb_bw">AVB BW Allocation (%)</label>
+                        <div class="slider-with-input">
+                            <input type="range" id="input_avb_bw" name="avb_bw" min="5" max="95" value="75">
+                            <input type="number" id="input_avb_bw_number" min="5" max="95" value="75" aria-label="AVB BW Allocation percentage">
+                        </div>
 
-                <label for="input_stream_format">Stream Format</label>
-                <select id="input_stream_format" name="stream_format">
-                    <option value="AM824nb">AM824 (non blocking)</option>
-                    <option value="AM824nb-async" selected>AM824 (non blocking, Async Packetization)</option>
-                    <option value="AM824b">AM824 (blocking)</option>
-                    <option value="AAF">AAF</option>
-                </select>
+                        <label for="input_stream_format">Stream Format</label>
+                        <select id="input_stream_format" name="stream_format">
+                            <option value="AM824nb">AM824 (non blocking)</option>
+                            <option value="AM824nb-async" selected>AM824 (non blocking, Async Packetization)</option>
+                            <option value="AM824b">AM824 (blocking)</option>
+                            <option value="AAF">AAF</option>
+                        </select>
 
-                <label for="input_sample_rate">Sample Rate</label>
-                <select id="input_sample_rate" name="sample_rate">
-                    <option value="32000">32.0 kHz</option>
-                    <option value="44100">44.1 kHz</option>
-                    <option value="48000" selected>48 kHz</option>
-                    <option value="88200">88.2 kHz</option>
-                    <option value="96000">96 kHz</option>
-                    <option value="176400">176.4 kHz</option>
-                    <option value="192000">192 kHz</option>
-                </select>
+                        <label for="input_sample_rate">Sample Rate</label>
+                        <select id="input_sample_rate" name="sample_rate">
+                            <option value="32000">32.0 kHz</option>
+                            <option value="44100">44.1 kHz</option>
+                            <option value="48000" selected>48 kHz</option>
+                            <option value="88200">88.2 kHz</option>
+                            <option value="96000">96 kHz</option>
+                            <option value="176400">176.4 kHz</option>
+                            <option value="192000">192 kHz</option>
+                        </select>
 
-                <label for="input_bits_per_sample">Bits/Sample</label>
-                <select id="input_bits_per_sample" name="bits_per_sample">
-                    <option value="16">16</option>
-                    <option value="24" selected>24</option>
-                    <option value="32">32</option>
-                </select>
+                        <label for="input_bits_per_sample">Bits/Sample</label>
+                        <select id="input_bits_per_sample" name="bits_per_sample">
+                            <option value="16">16</option>
+                            <option value="24" selected>24</option>
+                            <option value="32">32</option>
+                        </select>
 
-                <label for="input_samples_per_frame">AAF Samples/Frame</label>
-                <select id="input_samples_per_frame" name="samples_per_frame">
-                    <option value="default" selected>Default</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
-                    <option value="8">8</option>
-                    <option value="12">12</option>
-                    <option value="16">16</option>
-                    <option value="24">24</option>
-                    <option value="32">32</option>
-                    <option value="48">48</option>
-                    <option value="50">50</option>
-                    <option value="64">64</option>
-                    <option value="96">96</option>
-                    <option value="100">100</option>
-                    <option value="128">128</option>
-                    <option value="144">144</option>
-                    <option value="192">192</option>
-                    <option value="200">200</option>
-                    <option value="240">240</option>
-                    <option value="256">256</option>
-                    <option value="300">300</option>
-                    <option value="320">320</option>
-                    <option value="384">384</option>
-                    <option value="441">441</option>
-                    <option value="480">480</option>
-                    <option value="500">500</option>
-                    <option value="512">512</option>
-                    <option value="600">600</option>
-                    <option value="640">640</option>
-                    <option value="768">768</option>
-                    <option value="882">882</option>
-                    <option value="900">900</option>
-                    <option value="960">960</option>
-                    <option value="1000">1000</option>
-                    <option value="1024">1024</option>
-                </select>
+                        <label for="input_samples_per_frame">AAF Samples/Frame</label>
+                        <select id="input_samples_per_frame" name="samples_per_frame">
+                            <option value="default" selected>Default</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="12">12</option>
+                            <option value="16">16</option>
+                            <option value="24">24</option>
+                            <option value="32">32</option>
+                            <option value="48">48</option>
+                            <option value="50">50</option>
+                            <option value="64">64</option>
+                            <option value="96">96</option>
+                            <option value="100">100</option>
+                            <option value="128">128</option>
+                            <option value="144">144</option>
+                            <option value="192">192</option>
+                            <option value="200">200</option>
+                            <option value="240">240</option>
+                            <option value="256">256</option>
+                            <option value="300">300</option>
+                            <option value="320">320</option>
+                            <option value="384">384</option>
+                            <option value="441">441</option>
+                            <option value="480">480</option>
+                            <option value="500">500</option>
+                            <option value="512">512</option>
+                            <option value="600">600</option>
+                            <option value="640">640</option>
+                            <option value="768">768</option>
+                            <option value="882">882</option>
+                            <option value="900">900</option>
+                            <option value="960">960</option>
+                            <option value="1000">1000</option>
+                            <option value="1024">1024</option>
+                        </select>
 
-                <label for="input_channel_count">Channels Per Stream</label>
-                <div class="slider-with-input">
-                    <input type="range" id="input_channel_count" name="channel_count" min="1" max="738" value="1">
-                    <input type="number" id="input_channel_count_number" min="1" max="738" value="1" aria-label="Channels per stream">
-                </div>
+                        <label for="input_channel_count">Channels Per Stream</label>
+                        <div class="slider-with-input">
+                            <input type="range" id="input_channel_count" name="channel_count" min="1" max="738" value="1">
+                            <input type="number" id="input_channel_count_number" min="1" max="738" value="1" aria-label="Channels per stream">
+                        </div>
 
-                <fieldset>
-                    <label>
-                        <input type="checkbox" id="input_aes_siv" name="aes_siv" value="1">
-                        AES-SIV Encryption
-                    </label>
-                </fieldset>
+                        <fieldset>
+                            <label>
+                                <input type="checkbox" id="input_aes_siv" name="aes_siv" value="1">
+                                AES-SIV Encryption
+                            </label>
+                        </fieldset>
 
-                <label for="input_observation_interval_freq">Observation Interval</label>
-                <select id="input_observation_interval_freq" name="observation_interval_freq">
-                    <option value="8000" selected>Default (125 us)</option>
-                    <option value="250">4 ms</option>
-                    <option value="500">2 ms</option>
-                    <option value="1000">1 ms</option>
-                    <option value="1500">666.6 us</option>
-                    <option value="2000">500 us</option>
-                    <option value="3000">333.3 us</option>
-                    <option value="4000">250 us</option>
-                    <option value="5000">200 us</option>
-                    <option value="6000">166.6 us</option>
-                    <option value="8000">125 us</option>
-                </select>
+                        <label for="input_observation_interval_freq">Observation Interval</label>
+                        <select id="input_observation_interval_freq" name="observation_interval_freq">
+                            <option value="8000" selected>Default (125 us)</option>
+                            <option value="250">4 ms</option>
+                            <option value="500">2 ms</option>
+                            <option value="1000">1 ms</option>
+                            <option value="1500">666.6 us</option>
+                            <option value="2000">500 us</option>
+                            <option value="3000">333.3 us</option>
+                            <option value="4000">250 us</option>
+                            <option value="5000">200 us</option>
+                            <option value="6000">166.6 us</option>
+                            <option value="8000">125 us</option>
+                        </select>
+                    </form>
+                </article>
 
-                <button type="button" id="calculate">Calculate</button>
-            </form>
-        </article>
+                <!-- Answers Column -->
+                <article class="answers-column">
+                    <header>Results</header>
 
-        <!-- Answers Panel -->
-        <article id="answers" role="tabpanel" class="panel">
-            <header>Calculation Results</header>
+                    <label for="output_status">Status</label>
+                    <input type="text" id="output_status" readonly>
 
-            <label for="output_status">Status</label>
-            <input type="text" id="output_status" readonly>
+                    <label for="output_total_channels_per_net_link">Total channels per network link</label>
+                    <input type="text" id="output_total_channels_per_net_link" readonly>
 
-            <label for="output_total_channels_per_net_link">Total channels per network link</label>
-            <input type="text" id="output_total_channels_per_net_link" readonly>
+                    <label for="output_channels_per_stream">Total channels per stream</label>
+                    <input type="text" id="output_channels_per_stream" readonly>
 
-            <label for="output_channels_per_stream">Total channels per stream</label>
-            <input type="text" id="output_channels_per_stream" readonly>
+                    <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
+                    <input type="text" id="output_max_stream_count_per_net_link" readonly>
 
-            <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-            <input type="text" id="output_max_stream_count_per_net_link" readonly>
+                    <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
+                    <input type="text" id="output_total_bw_used_in_bps" readonly>
 
-            <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
-            <input type="text" id="output_total_bw_used_in_bps" readonly>
+                    <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
+                    <input type="text" id="output_leftover_bw_in_bps" readonly>
 
-            <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
-            <input type="text" id="output_leftover_bw_in_bps" readonly>
+                    <label for="output_ethernet_payload_length">Largest Frame Payload Length</label>
+                    <input type="text" id="output_ethernet_payload_length" readonly>
 
-            <label for="output_ethernet_payload_length">Largest Frame Payload Length</label>
-            <input type="text" id="output_ethernet_payload_length" readonly>
+                    <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
+                    <input type="text" id="output_octets_per_frame" readonly>
 
-            <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
-            <input type="text" id="output_octets_per_frame" readonly>
+                    <label for="output_micros_per_frame">Largest us per frame</label>
+                    <input type="text" id="output_micros_per_frame" readonly>
 
-            <label for="output_micros_per_frame">Largest us per frame</label>
-            <input type="text" id="output_micros_per_frame" readonly>
+                    <label for="output_bw_per_stream_in_bps">bps used per stream</label>
+                    <input type="text" id="output_bw_per_stream_in_bps" readonly>
 
-            <label for="output_bw_per_stream_in_bps">bps used per stream</label>
-            <input type="text" id="output_bw_per_stream_in_bps" readonly>
-
-            <label for="output_efficiency">Efficiency (audio payload bps / nominal packet bps)</label>
-            <input type="text" id="output_efficiency" readonly>
-        </article>
+                    <label for="output_efficiency">Efficiency (audio payload bps / nominal packet bps)</label>
+                    <input type="text" id="output_efficiency" readonly>
+                </article>
+            </div>
+        </div>
 
         <!-- Details Panel -->
         <article id="details" role="tabpanel" class="panel">
-            <header>Detailed Output (JSON)</header>
-            <pre id="output_detail"><code></code></pre>
+            <header>Detailed Calculation Breakdown</header>
+            <div id="output_detail_formatted" class="details-grid"></div>
+            <details>
+                <summary>Raw JSON Output</summary>
+                <pre id="output_detail"><code></code></pre>
+            </details>
         </article>
 
         <!-- Info Panel -->

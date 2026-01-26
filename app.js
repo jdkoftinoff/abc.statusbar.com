@@ -33,8 +33,8 @@
         const panels = document.querySelectorAll('.panel');
 
         function showPanel(hash) {
-            // Default to inputs if no hash
-            const targetId = hash ? hash.replace('#', '') : 'inputs';
+            // Default to calculator if no hash
+            const targetId = hash ? hash.replace('#', '') : 'calculator';
 
             // Hide all panels
             panels.forEach(panel => {
@@ -79,7 +79,7 @@
         });
 
         // Show initial panel
-        showPanel(location.hash || '#inputs');
+        showPanel(location.hash || '#calculator');
     }
 
     /**
@@ -94,6 +94,7 @@
         // Sync number input when slider changes
         slider.addEventListener('input', () => {
             numberInput.value = slider.value;
+            calculateLive();
         });
 
         // Sync slider when number input changes
@@ -107,6 +108,7 @@
                 if (val < min) val = min;
                 if (val > max) val = max;
                 slider.value = val;
+                calculateLive();
             }
         });
 
@@ -123,6 +125,7 @@
             }
             numberInput.value = val;
             slider.value = val;
+            calculateLive();
         });
     }
 
@@ -132,6 +135,29 @@
     function initSliders() {
         syncSliderAndNumber('input_avb_bw', 'input_avb_bw_number');
         syncSliderAndNumber('input_channel_count', 'input_channel_count_number');
+    }
+
+    /**
+     * Initialize live calculation on all inputs
+     */
+    function initLiveCalculation() {
+        const form = document.getElementById('inputForm');
+        if (!form) return;
+
+        // Add change listeners to all form elements
+        const inputs = form.querySelectorAll('select, input[type="checkbox"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', calculateLive);
+        });
+
+        // For range inputs, also listen to 'input' for live updates while dragging
+        const rangeInputs = form.querySelectorAll('input[type="range"]');
+        rangeInputs.forEach(input => {
+            input.addEventListener('input', calculateLive);
+        });
+
+        // Calculate on page load
+        calculateLive();
     }
 
     /**
@@ -176,6 +202,273 @@
     }
 
     /**
+     * Format a number with appropriate units
+     */
+    function formatNumber(value, decimals = 2) {
+        if (typeof value !== 'number' || isNaN(value)) return value;
+
+        if (Math.abs(value) >= 1e9) {
+            return (value / 1e9).toFixed(decimals) + ' G';
+        } else if (Math.abs(value) >= 1e6) {
+            return (value / 1e6).toFixed(decimals) + ' M';
+        } else if (Math.abs(value) >= 1e3) {
+            return (value / 1e3).toFixed(decimals) + ' k';
+        }
+        return value.toFixed ? value.toFixed(decimals) : value;
+    }
+
+    /**
+     * Format bandwidth in bps with units
+     */
+    function formatBps(value) {
+        if (typeof value !== 'number' || isNaN(value)) return value;
+
+        if (value >= 1e9) {
+            return (value / 1e9).toFixed(2) + ' Gbps';
+        } else if (value >= 1e6) {
+            return (value / 1e6).toFixed(2) + ' Mbps';
+        } else if (value >= 1e3) {
+            return (value / 1e3).toFixed(2) + ' kbps';
+        }
+        return value.toFixed(0) + ' bps';
+    }
+
+    /**
+     * Generate formatted details HTML
+     */
+    function generateFormattedDetails(outputs) {
+        const statusClass = outputs.status === 'success' ? 'success' : 'error';
+
+        // Get input descriptions
+        const streamFormatNames = {
+            'AM824nb': 'AM824 Non-Blocking Sync',
+            'AM824nb-async': 'AM824 Non-Blocking Async',
+            'AM824b': 'AM824 Blocking',
+            'AAF': 'AVTP Audio Format (AAF)'
+        };
+
+        const inputs = outputs.inputs || {};
+        const streamFormatName = streamFormatNames[inputs.stream_format] || inputs.stream_format;
+
+        let html = '';
+
+        // Status Section
+        html += `
+        <div class="details-section">
+            <h3>Calculation Status</h3>
+            <div class="details-row">
+                <span class="details-label">Result</span>
+                <span class="details-value ${statusClass}">${outputs.status}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Efficiency (audio payload / total bandwidth)</span>
+                <span class="details-value">${outputs.efficiency}%</span>
+            </div>
+        </div>`;
+
+        // Input Summary
+        html += `
+        <div class="details-section">
+            <h3>Input Parameters</h3>
+            <div class="details-row">
+                <span class="details-label">Network Speed</span>
+                <span class="details-value">${formatBps(inputs.network_speed_in_bps)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">AVB Bandwidth Allocation</span>
+                <span class="details-value">${inputs.avb_bw}%</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Stream Format</span>
+                <span class="details-value">${streamFormatName}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Sample Rate</span>
+                <span class="details-value">${(inputs.sample_rate / 1000).toFixed(1)} kHz</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Bits Per Sample</span>
+                <span class="details-value">${inputs.bits_per_sample} bits</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Channels Per Stream</span>
+                <span class="details-value">${inputs.channel_count}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">AES-SIV Encryption</span>
+                <span class="details-value">${inputs.aes_siv ? 'Enabled' : 'Disabled'}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Observation Interval</span>
+                <span class="details-value">${(1000000 / inputs.observation_intervals_per_second).toFixed(1)} µs</span>
+            </div>
+        </div>`;
+
+        // Stream Capacity
+        html += `
+        <div class="details-section">
+            <h3>Network Capacity</h3>
+            <div class="details-row">
+                <span class="details-label">Maximum Streams Per Network Link</span>
+                <span class="details-value">${outputs.max_stream_count_per_net_link}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Total Audio Channels Per Link</span>
+                <span class="details-value">${outputs.total_channels_per_net_link}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Channels Per Stream</span>
+                <span class="details-value">${outputs.channels_per_stream}</span>
+            </div>
+        </div>`;
+
+        // Bandwidth Usage
+        html += `
+        <div class="details-section">
+            <h3>Bandwidth Utilization</h3>
+            <div class="details-row">
+                <span class="details-label">Available AVB Bandwidth</span>
+                <span class="details-value">${formatBps(inputs.network_speed_in_bps * inputs.avb_bw / 100)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Bandwidth Per Stream</span>
+                <span class="details-value">${formatBps(outputs.bw_per_stream_in_bps)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Total Bandwidth Used (all streams)</span>
+                <span class="details-value">${formatBps(outputs.total_bw_used_in_bps)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Leftover AVB Bandwidth</span>
+                <span class="details-value">${formatBps(outputs.leftover_bw_in_bps)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Raw Audio Bitrate Per Stream</span>
+                <span class="details-value">${formatBps(outputs.audio_bps)}</span>
+            </div>
+        </div>`;
+
+        // Frame Details
+        html += `
+        <div class="details-section">
+            <h3>Ethernet Frame Details</h3>
+            <div class="details-row">
+                <span class="details-label">Samples Per Frame</span>
+                <span class="details-value">${outputs.samples_per_frame}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Bytes Per Sample</span>
+                <span class="details-value">${outputs.octets_per_sample} bytes</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Frame Payload Length</span>
+                <span class="details-value">${outputs.ethernet_payload_length} bytes</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Total Frame Size (including all overhead)</span>
+                <span class="details-value">${outputs.octets_per_frame} bytes</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Frame Transmission Time</span>
+                <span class="details-value">${outputs.micros_per_frame?.toFixed(3)} µs</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Frames Per Second</span>
+                <span class="details-value">${formatNumber(outputs.frames_per_second, 0)}</span>
+            </div>
+        </div>`;
+
+        // Frame Breakdown
+        if (outputs.ethernet_frame) {
+            const frame = outputs.ethernet_frame;
+            html += `
+        <div class="details-section">
+            <h3>Frame Structure Breakdown</h3>
+            <table class="frame-breakdown">
+                <tr><td>Interframe Gap</td><td>${frame.interframe_gap} bytes</td></tr>
+                <tr><td>Preamble + Start Frame Delimiter</td><td>${frame.preambles_and_sfd} bytes</td></tr>
+                <tr><td>Ethernet Header</td><td>${frame.ethernet_header} bytes</td></tr>
+                <tr><td>VLAN Tag</td><td>${frame.vlan_tag} bytes</td></tr>
+                <tr><td>AVTPDU Header</td><td>${frame.avtpdu_header} bytes</td></tr>
+                ${frame.cip_header ? `<tr><td>CIP Header (AM824)</td><td>${frame.cip_header} bytes</td></tr>` : ''}
+                ${frame.aaf_header ? `<tr><td>AAF Header</td><td>${frame.aaf_header} bytes</td></tr>` : ''}
+                <tr><td>Audio Payload</td><td>${frame.audio_payload} bytes</td></tr>
+                ${frame.padding ? `<tr><td>Padding (minimum frame size)</td><td>${frame.padding} bytes</td></tr>` : ''}
+                ${frame.aes_siv_padding ? `<tr><td>AES-SIV Padding</td><td>${frame.aes_siv_padding} bytes</td></tr>` : ''}
+                ${frame.aes_siv_subtype_data ? `<tr><td>AES-SIV Subtype Data</td><td>${frame.aes_siv_subtype_data} bytes</td></tr>` : ''}
+                ${frame.aes_siv_key_id ? `<tr><td>AES-SIV Key ID</td><td>${frame.aes_siv_key_id} bytes</td></tr>` : ''}
+                ${frame.aes_siv_iv ? `<tr><td>AES-SIV Initialization Vector</td><td>${frame.aes_siv_iv} bytes</td></tr>` : ''}
+                <tr><td>Ethernet Frame Check Sequence</td><td>${frame.ethernet_fcs} bytes</td></tr>
+            </table>
+        </div>`;
+        }
+
+        // Timing Details
+        html += `
+        <div class="details-section">
+            <h3>Timing Parameters</h3>
+            <div class="details-row">
+                <span class="details-label">Observation Intervals Per Second</span>
+                <span class="details-value">${formatNumber(outputs.observation_intervals_per_second, 0)}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Frames Per Observation Interval</span>
+                <span class="details-value">${outputs.frames_per_observation_interval}</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Time Per Observation Interval</span>
+                <span class="details-value">${(1000000 / outputs.observation_intervals_per_second).toFixed(1)} µs</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Time Spent Transmitting Per Interval</span>
+                <span class="details-value">${outputs.micros_spent_per_observation_interval?.toFixed(3)} µs</span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Available Time Per Interval (at ${inputs.avb_bw}%)</span>
+                <span class="details-value">${outputs.available_time_per_observation_interval_in_micros?.toFixed(3)} µs</span>
+            </div>
+            ${outputs.syt_interval ? `
+            <div class="details-row">
+                <span class="details-label">SYT Interval (AM824)</span>
+                <span class="details-value">${outputs.syt_interval} samples</span>
+            </div>` : ''}
+        </div>`;
+
+        return html;
+    }
+
+    /**
+     * Format output value based on field type
+     */
+    function formatOutputValue(key, value) {
+        if (value === undefined || value === null) return '';
+
+        // Bandwidth fields - format as Gbps/Mbps/kbps
+        if (key === 'total_bw_used_in_bps' ||
+            key === 'leftover_bw_in_bps' ||
+            key === 'bw_per_stream_in_bps') {
+            return formatBps(value);
+        }
+
+        // Microseconds - format with 3 decimal places
+        if (key === 'micros_per_frame') {
+            return value.toFixed(3) + ' µs';
+        }
+
+        // Efficiency - add percent sign
+        if (key === 'efficiency') {
+            return value + '%';
+        }
+
+        // Octets/bytes - add unit
+        if (key === 'octets_per_frame' || key === 'ethernet_payload_length') {
+            return value + ' bytes';
+        }
+
+        return value;
+    }
+
+    /**
      * Display output values in the form
      * @param {Object} outputs - Results from calculate_avb()
      */
@@ -183,11 +476,17 @@
         for (const key of OUTPUT_ITEMS) {
             const element = document.getElementById('output_' + key);
             if (element && outputs[key] !== undefined) {
-                element.value = outputs[key];
+                element.value = formatOutputValue(key, outputs[key]);
             }
         }
 
-        // Display detailed JSON output
+        // Display formatted details
+        const formattedElement = document.getElementById('output_detail_formatted');
+        if (formattedElement) {
+            formattedElement.innerHTML = generateFormattedDetails(outputs);
+        }
+
+        // Display raw JSON output
         const detailElement = document.getElementById('output_detail');
         if (detailElement) {
             detailElement.textContent = JSON.stringify(outputs, null, 2);
@@ -195,9 +494,9 @@
     }
 
     /**
-     * Process the form and calculate results
+     * Perform live calculation and update results
      */
-    function processForm() {
+    function calculateLive() {
         // Get input values
         const inputs = getInputValues();
 
@@ -206,25 +505,6 @@
 
         // Display outputs
         setOutputValues(outputs);
-
-        // Navigate to answers panel
-        history.pushState(null, '', '#answers');
-        const panels = document.querySelectorAll('.panel');
-        const tabs = document.querySelectorAll('.tab');
-
-        panels.forEach(p => {
-            p.classList.remove('active');
-            p.setAttribute('aria-hidden', 'true');
-        });
-        tabs.forEach(t => {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-        });
-
-        document.getElementById('answers').classList.add('active');
-        document.getElementById('answers').setAttribute('aria-hidden', 'false');
-        document.querySelector('.tab[href="#answers"]').classList.add('active');
-        document.querySelector('.tab[href="#answers"]').setAttribute('aria-selected', 'true');
     }
 
     /**
@@ -237,11 +517,8 @@
         // Set up sliders
         initSliders();
 
-        // Set up calculate button
-        const calculateBtn = document.getElementById('calculate');
-        if (calculateBtn) {
-            calculateBtn.addEventListener('click', processForm);
-        }
+        // Set up live calculation
+        initLiveCalculation();
 
         // Register service worker for offline support
         if ('serviceWorker' in navigator) {
