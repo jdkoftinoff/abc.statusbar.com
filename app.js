@@ -440,12 +440,18 @@
     /**
      * Format output value based on field type
      */
-    function formatOutputValue(key, value) {
+    function formatOutputValue(key, value, outputs) {
         if (value === undefined || value === null) return '';
 
-        // Bandwidth fields - format as Gbps/Mbps/kbps
-        if (key === 'total_bw_used_in_bps' ||
-            key === 'leftover_bw_in_bps' ||
+        // Total BW Used - show bps and percentage of link
+        if (key === 'total_bw_used_in_bps' && outputs && outputs.inputs) {
+            const networkSpeed = outputs.inputs.network_speed_in_bps;
+            const percent = networkSpeed ? ((value / networkSpeed) * 100).toFixed(1) : 0;
+            return formatBps(value) + ' (' + percent + '%)';
+        }
+
+        // Other bandwidth fields - format as Gbps/Mbps/kbps
+        if (key === 'leftover_bw_in_bps' ||
             key === 'bw_per_stream_in_bps') {
             return formatBps(value);
         }
@@ -476,7 +482,7 @@
         for (const key of OUTPUT_ITEMS) {
             const element = document.getElementById('output_' + key);
             if (element && outputs[key] !== undefined) {
-                const formattedValue = formatOutputValue(key, outputs[key]);
+                const formattedValue = formatOutputValue(key, outputs[key], outputs);
                 // Use textContent for spans, value for inputs
                 if (element.tagName === 'SPAN') {
                     element.textContent = formattedValue;
