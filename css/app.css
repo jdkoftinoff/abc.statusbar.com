@@ -183,6 +183,11 @@ input[readonly] {
     flex: 1;
 }
 
+.details-label::after {
+    content: ": ";
+    white-space: pre;
+}
+
 .details-value {
     font-weight: 600;
     text-align: right;
