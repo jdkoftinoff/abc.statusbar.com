@@ -82,6 +82,44 @@ input[readonly] {
     cursor: default;
 }
 
+/* Compact results grid */
+.results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-label {
+    color: var(--pico-muted-color);
+    font-size: 0.9rem;
+}
+
+.result-value {
+    font-weight: 600;
+    font-family: var(--pico-font-family-monospace);
+    text-align: right;
+}
+
+.result-value.success {
+    color: var(--pico-ins-color);
+}
+
+.result-value.error {
+    color: var(--pico-del-color);
+}
+
 /* Details panel - formatted output */
 .details-grid {
     display: grid;
@@ -196,17 +234,6 @@ article > header {
     width: 5rem;
     margin-bottom: 0;
     text-align: center;
-}
-
-/* Status field styling based on value */
-#output_status[value="success"] {
-    color: var(--pico-ins-color);
-    border-color: var(--pico-ins-color);
-}
-
-#output_status:not([value="success"]):not([value=""]) {
-    color: var(--pico-del-color);
-    border-color: var(--pico-del-color);
 }
 
 /* Footer styling */

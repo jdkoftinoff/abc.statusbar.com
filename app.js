@@ -476,7 +476,24 @@
         for (const key of OUTPUT_ITEMS) {
             const element = document.getElementById('output_' + key);
             if (element && outputs[key] !== undefined) {
-                element.value = formatOutputValue(key, outputs[key]);
+                const formattedValue = formatOutputValue(key, outputs[key]);
+                // Use textContent for spans, value for inputs
+                if (element.tagName === 'SPAN') {
+                    element.textContent = formattedValue;
+                } else {
+                    element.value = formattedValue;
+                }
+            }
+        }
+
+        // Style status based on success/error
+        const statusElement = document.getElementById('output_status');
+        if (statusElement) {
+            statusElement.classList.remove('success', 'error');
+            if (outputs.status === 'success') {
+                statusElement.classList.add('success');
+            } else if (outputs.status) {
+                statusElement.classList.add('error');
             }
         }
 

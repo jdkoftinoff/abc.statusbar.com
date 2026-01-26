@@ -155,39 +155,52 @@
                 <!-- Answers Column -->
                 <article class="answers-column">
                     <header>Results</header>
-
-                    <label for="output_status">Status</label>
-                    <input type="text" id="output_status" readonly>
-
-                    <label for="output_total_channels_per_net_link">Total channels per network link</label>
-                    <input type="text" id="output_total_channels_per_net_link" readonly>
-
-                    <label for="output_channels_per_stream">Total channels per stream</label>
-                    <input type="text" id="output_channels_per_stream" readonly>
-
-                    <label for="output_max_stream_count_per_net_link">Max stream count per network link</label>
-                    <input type="text" id="output_max_stream_count_per_net_link" readonly>
-
-                    <label for="output_total_bw_used_in_bps">bps used for max stream count</label>
-                    <input type="text" id="output_total_bw_used_in_bps" readonly>
-
-                    <label for="output_leftover_bw_in_bps">Leftover AVB BW in bps</label>
-                    <input type="text" id="output_leftover_bw_in_bps" readonly>
-
-                    <label for="output_ethernet_payload_length">Largest Frame Payload Length</label>
-                    <input type="text" id="output_ethernet_payload_length" readonly>
-
-                    <label for="output_octets_per_frame">Largest Octets per frame (inc. all overhead)</label>
-                    <input type="text" id="output_octets_per_frame" readonly>
-
-                    <label for="output_micros_per_frame">Largest us per frame</label>
-                    <input type="text" id="output_micros_per_frame" readonly>
-
-                    <label for="output_bw_per_stream_in_bps">bps used per stream</label>
-                    <input type="text" id="output_bw_per_stream_in_bps" readonly>
-
-                    <label for="output_efficiency">Efficiency (audio payload bps / nominal packet bps)</label>
-                    <input type="text" id="output_efficiency" readonly>
+                    <div class="results-grid">
+                        <div class="result-row">
+                            <span class="result-label">Status</span>
+                            <span class="result-value" id="output_status"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Channels/Link</span>
+                            <span class="result-value" id="output_total_channels_per_net_link"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Channels/Stream</span>
+                            <span class="result-value" id="output_channels_per_stream"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Max Streams/Link</span>
+                            <span class="result-value" id="output_max_stream_count_per_net_link"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">BW/Stream</span>
+                            <span class="result-value" id="output_bw_per_stream_in_bps"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Total BW Used</span>
+                            <span class="result-value" id="output_total_bw_used_in_bps"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Leftover BW</span>
+                            <span class="result-value" id="output_leftover_bw_in_bps"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Payload Size</span>
+                            <span class="result-value" id="output_ethernet_payload_length"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Frame Size</span>
+                            <span class="result-value" id="output_octets_per_frame"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Frame Time</span>
+                            <span class="result-value" id="output_micros_per_frame"></span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Efficiency</span>
+                            <span class="result-value" id="output_efficiency"></span>
+                        </div>
+                    </div>
                 </article>
             </div>
         </div>
