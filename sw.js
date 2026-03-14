@@ -3,7 +3,7 @@
  * Provides offline support via Cache API
  */
 
-const CACHE_NAME = 'avb-calc-v2026-7';
+const CACHE_NAME = 'avb-calc-v2026-8';
 
 // Assets to cache for offline use
 const ASSETS_TO_CACHE = [
